@@ -156,20 +156,16 @@
 }
 
 .metric-tabs {
-  display: grid;
+  display: flex;
   gap: 0.75rem;
-}
-
-@media (min-width: 640px) {
-  .metric-tabs {
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-  }
 }
 
 .metric-tab {
   display: flex;
   flex-direction: column;
   gap: 0.25rem;
+  flex: 1 1 0%;
+  min-width: 0;
   border-radius: 1.5rem;
   border: 1px solid var(--border-soft);
   background: rgba(10, 17, 13, 0.85);

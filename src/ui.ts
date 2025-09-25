@@ -170,7 +170,7 @@ export class UIController {
     title.innerHTML = `
       <span class="section-heading">Environmental health explorer</span>
       <h1 class="text-3xl font-semibold leading-tight text-transparent bg-gradient-to-r from-slate-900 via-primary/80 to-emerald-400 bg-clip-text dark:from-white dark:via-primary/80 dark:to-emerald-300">County Health vs Air Quality</h1>
-      <p class="input-description">Explore CDC PLACES chronic disease burdens alongside PM₂.₅ exposure to spot elevated health burdens across the United States.</p>
+      <p class="input-description">Explore CDC PLACES chronic disease burdens alongside pollution to spot elevated health burdens across the United States.</p>
     `;
     this.container.appendChild(title);
 
@@ -299,7 +299,7 @@ export class UIController {
       <ul class="mt-2 list-disc space-y-1 pl-4">
         <li>CDC PLACES 2024 release (crude prevalence) for chronic conditions.</li>
         <li>EPA Air Quality System PM₂.₅ monitor annual means averaged across available monitors.</li>
-        <li>Residuals derive from an ordinary least squares fit of HBI on PM₂.₅ exposure.</li>
+        <li>Residuals derive from an ordinary least squares fit of HBI on pollution.</li>
         <li>Methodology and limitations described in the README.</li>
       </ul>
     `;

@@ -299,5 +299,6 @@ export function formatNumber(value: number | null): string {
 export function metricLabel(metric: MetricKey): string {
   if (metric === 'hbi') return 'Health Burden Index';
   if (metric === 'exposure') return 'Exposure Index';
-  return 'Residual (HBI – Expected)';
+  if (metric === 'residual') return 'Residual (HBI – Expected)';
+  return 'Residual (Expected – HBI)';
 }

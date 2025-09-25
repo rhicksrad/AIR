@@ -1,4 +1,4 @@
-export type MetricKey = 'hbi' | 'exposure' | 'residual';
+export type MetricKey = 'hbi' | 'exposure' | 'residual' | 'pollutionMinusHealth';
 
 export type BreakMode = 'quantile' | 'equal' | 'jenks';
 
@@ -33,6 +33,7 @@ export interface CountyDatum {
   hbi: number | null;
   exposure: number | null;
   residual: number | null;
+  pollutionMinusHealth: number | null;
   expectedHbi: number | null;
   hbiZ: number | null;
   exposureZ: number | null;

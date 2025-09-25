@@ -62,6 +62,7 @@ mapColumn.appendChild(metricTabs);
 
 const metricButtons = new Map<MetricKey, HTMLButtonElement>();
 const metricDetails: Record<MetricKey, string> = {
+
   hbi: 'Health',
   exposure: 'Pollution',
   residual: 'Health minus pollution'

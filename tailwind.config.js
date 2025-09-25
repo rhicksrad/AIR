@@ -8,6 +8,9 @@ export default {
     extend: {
       colors: {
         primary: '#1d4ed8'
+      },
+      fontFamily: {
+        sans: ['"Plus Jakarta Sans"', 'system-ui', 'sans-serif']
       }
     }
   },

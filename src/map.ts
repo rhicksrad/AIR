@@ -89,7 +89,7 @@ export class CountyMap {
       .append('svg')
       .attr('role', 'img')
       .attr('aria-label', 'Map of U.S. counties')
-      .attr('class', 'w-full h-full');
+      .attr('class', 'h-full w-full');
 
     const defs = this.svg.append('defs');
     const pattern = defs
@@ -115,12 +115,12 @@ export class CountyMap {
     this.tooltip = d3
       .select(container)
       .append('div')
-      .attr('class', 'pointer-events-none absolute hidden rounded-lg bg-slate-900/90 px-4 py-3 text-sm shadow-xl backdrop-blur text-slate-100');
+      .attr('class', 'map-tooltip');
 
     this.legend = d3
       .select(container)
       .append('div')
-      .attr('class', 'absolute right-4 top-4 z-10 flex w-56 flex-col gap-2 rounded-xl bg-white/90 p-3 text-xs text-slate-700 shadow-lg dark:bg-slate-900/90 dark:text-slate-200');
+      .attr('class', 'map-legend');
 
     this.setupZoom();
     this.prepareLayers(geography);

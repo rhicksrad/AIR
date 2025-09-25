@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import type { GeoPermissibleObjects } from 'd3';
+import type { GeoPermissibleObjects, GeoProjection } from 'd3';
 import type { GeographyData } from './data';
 import type { CountyDatum, LegendBreaks, MetricKey } from './types';
 import { metricLabel } from './stats';
@@ -16,12 +16,38 @@ interface MapCallbacks {
 interface InsetDefinition {
   code: string;
   label: string;
+  width: number;
+  height: number;
+  gap?: number;
+  fitPadding?: [number, number];
+  createProjection: () => GeoProjection;
 }
 
 const INSETS: InsetDefinition[] = [
-  { code: '02', label: 'Alaska' },
-  { code: '15', label: 'Hawaii' },
-  { code: '72', label: 'Puerto Rico' }
+  {
+    code: '02',
+    label: 'Alaska',
+    width: 220,
+    height: 150,
+    fitPadding: [16, 20],
+    gap: 16,
+    createProjection: () =>
+      d3
+        .geoConicEqualArea()
+        .rotate([154, 0])
+        .center([-2, 58.5])
+        .parallels([55, 65])
+        .precision(0.1)
+  },
+  {
+    code: '15',
+    label: 'Hawaii',
+    width: 180,
+    height: 120,
+    fitPadding: [12, 16],
+    gap: 12,
+    createProjection: () => d3.geoMercator().center([-157, 20]).precision(0.1)
+  }
 ];
 
 const DEFAULT_COLORS = {
@@ -197,9 +223,13 @@ export class CountyMap {
           }
         });
 
-      group.append('rect').attr('class', 'inset-border fill-none stroke-slate-900/20 dark:stroke-slate-100/20');
-      group.append('g').attr('class', 'inset-label');
-      this.insetLayers.set(inset.code, group);
+      group
+        .append('rect')
+        .attr('class', 'inset-border fill-none stroke-slate-900/20 dark:stroke-slate-100/20')
+        .attr('rx', 8)
+        .attr('ry', 8)
+        .attr('width', inset.width)
+        .attr('height', inset.height);
       insetPaths.append('title').text(`${inset.label}`);
     }
   }
@@ -226,22 +256,26 @@ export class CountyMap {
   }
 
   private updateInsets() {
-    const insetWidth = 180;
-    const insetHeight = 120;
     const padding = 16;
-    let offsetY = this.height - padding - insetHeight;
-    const offsetX = this.width - padding - insetWidth;
+    const offsetX = this.width - padding;
+    let offsetY = this.height - padding;
     for (const inset of INSETS) {
       const group = this.insetLayers.get(inset.code);
       if (!group) continue;
-      group.attr('transform', `translate(${offsetX},${offsetY})`);
+      const insetWidth = inset.width;
+      const insetHeight = inset.height;
+      const gap = inset.gap ?? 12;
+      offsetY -= insetHeight;
+      group.attr('transform', `translate(${offsetX - insetWidth},${offsetY})`);
       const counties = group.selectAll<SVGPathElement, GeoJSON.Feature>('path');
       const features = counties.data();
       if (features.length === 0) continue;
-      const projection = d3.geoMercator().fitExtent(
+      const projection = inset.createProjection();
+      const [paddingX, paddingY] = inset.fitPadding ?? [8, 12];
+      projection.fitExtent(
         [
-          [8, 12],
-          [insetWidth - 8, insetHeight - 12]
+          [paddingX, paddingY],
+          [insetWidth - paddingX, insetHeight - paddingY]
         ],
         featureCollection(features as GeoJSON.Feature[])
       );
@@ -250,14 +284,12 @@ export class CountyMap {
       group
         .selectAll<SVGRectElement, unknown>('rect.inset-border')
         .attr('width', insetWidth)
-        .attr('height', insetHeight)
-        .attr('rx', 8)
-        .attr('ry', 8);
+        .attr('height', insetHeight);
       group
         .selectAll<SVGTextElement, unknown>('text')
         .attr('x', insetWidth)
         .attr('y', 12);
-      offsetY -= insetHeight + 12;
+      offsetY -= gap;
     }
   }
 

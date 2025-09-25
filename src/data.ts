@@ -48,7 +48,16 @@ export async function loadGeography(): Promise<GeographyData> {
     throw new Error('Failed to load topology');
   }
   const counties = feature(topology as any, (topology as any).objects.counties) as GeoJSON.FeatureCollection;
-  const statesMesh = mesh(topology as any, (topology as any).objects.states);
+  const insetStateCodes = new Set(['02', '15']);
+  const statesObject = (topology as any).objects.states;
+  const contiguousStates = {
+    type: 'GeometryCollection',
+    geometries: statesObject.geometries.filter((geom: { id?: string | number }) => {
+      const id = geom.id != null ? geom.id.toString().padStart(2, '0') : '';
+      return !insetStateCodes.has(id);
+    })
+  };
+  const statesMesh = mesh(topology as any, contiguousStates as any, (a, b) => a !== b);
   return { counties, statesMesh };
 }
 

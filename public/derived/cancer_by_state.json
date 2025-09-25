@@ -1,0 +1,82 @@
+[
+  {
+    "state": "Andhra Pradesh",
+    "incidence_2019": 1200,
+    "incidence_2020": 1180,
+    "incidence_2021": 1215,
+    "incidence_2022": 1230,
+    "incidence_cagr_19_22": 0.008264837609052167
+  },
+  {
+    "state": "Bihar",
+    "incidence_2019": 900,
+    "incidence_2020": 920,
+    "incidence_2021": 940,
+    "incidence_2022": 960,
+    "incidence_cagr_19_22": 0.02174590985807079
+  },
+  {
+    "state": "Delhi",
+    "incidence_2019": 1500,
+    "incidence_2020": 1520,
+    "incidence_2021": 1540,
+    "incidence_2022": 1580,
+    "incidence_cagr_19_22": 0.017470772368319842
+  },
+  {
+    "state": "Gujarat",
+    "incidence_2019": 1100,
+    "incidence_2020": 1125,
+    "incidence_2021": 1150,
+    "incidence_2022": 1180,
+    "incidence_cagr_19_22": 0.023677381203403458
+  },
+  {
+    "state": "Karnataka",
+    "incidence_2019": 1300,
+    "incidence_2020": 1310,
+    "incidence_2021": 1340,
+    "incidence_2022": 1375,
+    "incidence_cagr_19_22": 0.018872362595751646
+  },
+  {
+    "state": "Kerala",
+    "incidence_2019": 1400,
+    "incidence_2020": 1420,
+    "incidence_2021": 1450,
+    "incidence_2022": 1490,
+    "incidence_cagr_19_22": 0.020985115898534135
+  },
+  {
+    "state": "Maharashtra",
+    "incidence_2019": 1600,
+    "incidence_2020": 1620,
+    "incidence_2021": 1650,
+    "incidence_2022": 1700,
+    "incidence_cagr_19_22": 0.020413775479336982
+  },
+  {
+    "state": "Tamil Nadu",
+    "incidence_2019": 1350,
+    "incidence_2020": 1365,
+    "incidence_2021": 1380,
+    "incidence_2022": 1400,
+    "incidence_cagr_19_22": 0.012196323958554078
+  },
+  {
+    "state": "Telangana",
+    "incidence_2019": 1000,
+    "incidence_2020": 1020,
+    "incidence_2021": 1045,
+    "incidence_2022": 1080,
+    "incidence_cagr_19_22": 0.025985568006018145
+  },
+  {
+    "state": "West Bengal",
+    "incidence_2019": 1250,
+    "incidence_2020": 1270,
+    "incidence_2021": 1295,
+    "incidence_2022": 1320,
+    "incidence_cagr_19_22": 0.018328673931897743
+  }
+]

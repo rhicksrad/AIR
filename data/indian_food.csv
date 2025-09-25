@@ -1,0 +1,21 @@
+name,ingredients,diet,prep_time,cook_time,flavor_profile,course,state,region
+Hyderabadi Biryani,"rice, chicken, yogurt, saffron, turmeric, chili",non vegetarian,60,90,spicy,main course,Telangana,South
+Pesarattu,"green gram, ginger, chili, cumin, oil",vegetarian,20,15,savory,breakfast,Andhra Pradesh,South
+Mishti Doi,"milk, yogurt, sugar, cardamom",vegetarian,30,45,sweet,dessert,West Bengal,East
+Fish Curry,"fish, coconut, tamarind, chili, turmeric",non vegetarian,25,30,spicy,main course,Kerala,South
+Sambar,"lentil, tamarind, vegetables, chili, turmeric",vegetarian,20,35,spicy,main course,Tamil Nadu,South
+Sarson da Saag,"mustard greens, spinach, corn flour, ghee",vegetarian,45,60,spicy,main course,Punjab,North
+Rogan Josh,"mutton, yogurt, chili, ginger, garlic",non vegetarian,30,90,spicy,main course,Jammu and Kashmir,North
+Dhokla,"gram flour, yogurt, turmeric, chili",vegetarian,15,20,savory,breakfast,Gujarat,West
+Vada Pav,"potato, bread, chili, garlic",vegetarian,10,10,spicy,snack,Maharashtra,West
+Idli,"rice, urad dal, salt",vegetarian,480,20,bland,breakfast,Karnataka,South
+Puttu,"rice flour, coconut",vegetarian,15,20,bland,breakfast,Kerala,South
+Chicken 65,"chicken, chili, curry leaves, yogurt",non vegetarian,40,25,spicy,appetizer,Tamil Nadu,South
+Chole Bhature,"chickpea, flour, yogurt, oil",vegetarian,30,45,spicy,main course,Delhi,North
+Bisi Bele Bath,"rice, lentil, tamarind, vegetables",vegetarian,35,50,spicy,main course,Karnataka,South
+Litti Chokha,"wheat flour, gram flour, ghee, vegetables",vegetarian,45,30,spicy,main course,Bihar,East
+Thalipeeth,"flour, onion, chili, spices",vegetarian,25,20,spicy,breakfast,Maharashtra,West
+Prawn Curry,"prawn, coconut, chili, turmeric",non vegetarian,30,25,spicy,main course,Goa,West
+Daal Baati Churma,"wheat flour, lentil, ghee",vegetarian,45,60,sweet,main course,Rajasthan,West
+Makki di Roti,"corn flour, butter",vegetarian,30,15,bland,main course,Punjab,North
+Aloo Posto,"potato, poppy seed, mustard oil",vegetarian,20,25,spicy,main course,West Bengal,East

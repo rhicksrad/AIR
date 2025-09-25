@@ -1,0 +1,41 @@
+{
+  "type": "Topology",
+  "transform": { "scale": [0.1, 0.1], "translate": [70, 5] },
+  "objects": {
+    "states": {
+      "type": "GeometryCollection",
+      "geometries": [
+        { "type": "Polygon", "arcs": [[0]], "properties": { "name": "Andhra Pradesh" } },
+        { "type": "Polygon", "arcs": [[1]], "properties": { "name": "Bihar" } },
+        { "type": "Polygon", "arcs": [[2]], "properties": { "name": "Delhi" } },
+        { "type": "Polygon", "arcs": [[3]], "properties": { "name": "Gujarat" } },
+        { "type": "Polygon", "arcs": [[4]], "properties": { "name": "Karnataka" } },
+        { "type": "Polygon", "arcs": [[5]], "properties": { "name": "Kerala" } },
+        { "type": "Polygon", "arcs": [[6]], "properties": { "name": "Maharashtra" } },
+        { "type": "Polygon", "arcs": [[7]], "properties": { "name": "Tamil Nadu" } },
+        { "type": "Polygon", "arcs": [[8]], "properties": { "name": "Telangana" } },
+        { "type": "Polygon", "arcs": [[9]], "properties": { "name": "West Bengal" } },
+        { "type": "Polygon", "arcs": [[10]], "properties": { "name": "Goa" } },
+        { "type": "Polygon", "arcs": [[11]], "properties": { "name": "Punjab" } },
+        { "type": "Polygon", "arcs": [[12]], "properties": { "name": "Rajasthan" } },
+        { "type": "Polygon", "arcs": [[13]], "properties": { "name": "Jammu and Kashmir" } }
+      ]
+    }
+  },
+  "arcs": [
+    [[150,120],[20,0],[0,10],[-20,0],[0,-10]],
+    [[200,80],[15,0],[0,10],[-15,0],[0,-10]],
+    [[190,60],[8,0],[0,8],[-8,0],[0,-8]],
+    [[120,90],[18,0],[0,12],[-18,0],[0,-12]],
+    [[140,130],[18,0],[0,12],[-18,0],[0,-12]],
+    [[135,150],[10,0],[0,8],[-10,0],[0,-8]],
+    [[130,110],[22,0],[0,14],[-22,0],[0,-14]],
+    [[150,140],[18,0],[0,10],[-18,0],[0,-10]],
+    [[155,125],[12,0],[0,8],[-12,0],[0,-8]],
+    [[210,100],[20,0],[0,12],[-20,0],[0,-12]],
+    [[125,115],[6,0],[0,6],[-6,0],[0,-6]],
+    [[175,70],[18,0],[0,12],[-18,0],[0,-12]],
+    [[160,85],[22,0],[0,14],[-22,0],[0,-14]],
+    [[170,50],[20,0],[0,14],[-20,0],[0,-14]]
+  ]
+}

@@ -1,44 +1,32 @@
-name: Deploy static site to Pages
-
+name: Deploy static site to GitHub Pages
 on:
   push:
-    branches: ["main"]
-  workflow_dispatch:
-
+    branches: [main]
 permissions:
   contents: read
   pages: write
   id-token: write
-
 concurrency:
-  group: pages
-  cancel-in-progress: true
+  group: 'pages'
+  cancel-in-progress: false
 
 jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - uses: actions/checkout@v4
 
-      - name: Set up pnpm
-        uses: pnpm/action-setup@v3
-        with:
-          version: 10.5.2
-
-      - name: Set up Node.js
-        uses: actions/setup-node@v4
+      - uses: actions/setup-node@v4
         with:
           node-version: 20
-          cache: pnpm
+          cache: 'pnpm'
 
-      - name: Install dependencies
-        run: pnpm install
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: true
 
-      - name: Build site
-        run: pnpm build
-        env:
-          NODE_OPTIONS: --max_old_space_size=4096
+      - run: pnpm run build
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

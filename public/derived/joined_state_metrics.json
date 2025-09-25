@@ -1,0 +1,412 @@
+[
+  {
+    "state": "Andhra Pradesh",
+    "cancer": {
+      "state": "Andhra Pradesh",
+      "incidence_2019": 1200,
+      "incidence_2020": 1180,
+      "incidence_2021": 1215,
+      "incidence_2022": 1230,
+      "incidence_cagr_19_22": 0.008264837609052167
+    },
+    "cuisine": {
+      "state": "Andhra Pradesh",
+      "dish_count": 1,
+      "pct_veg": 1,
+      "pct_sweet": 0,
+      "avg_prep_time": 20,
+      "avg_cook_time": 15,
+      "pct_lentil_like": 0,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 0,
+      "pct_fish": 0,
+      "pct_turmeric": 0,
+      "ingredient_stats": {
+        "green gram": 1,
+        "ginger": 1,
+        "chili": 1,
+        "cumin": 1,
+        "oil": 1
+      }
+    }
+  },
+  {
+    "state": "Bihar",
+    "cancer": {
+      "state": "Bihar",
+      "incidence_2019": 900,
+      "incidence_2020": 920,
+      "incidence_2021": 940,
+      "incidence_2022": 960,
+      "incidence_cagr_19_22": 0.02174590985807079
+    },
+    "cuisine": {
+      "state": "Bihar",
+      "dish_count": 1,
+      "pct_veg": 1,
+      "pct_sweet": 0,
+      "avg_prep_time": 45,
+      "avg_cook_time": 30,
+      "pct_lentil_like": 0,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 0,
+      "pct_fish": 0,
+      "pct_turmeric": 0,
+      "ingredient_stats": {
+        "wheat flour": 1,
+        "gram flour": 1,
+        "ghee": 1,
+        "vegetables": 1
+      }
+    }
+  },
+  {
+    "state": "Delhi",
+    "cancer": {
+      "state": "Delhi",
+      "incidence_2019": 1500,
+      "incidence_2020": 1520,
+      "incidence_2021": 1540,
+      "incidence_2022": 1580,
+      "incidence_cagr_19_22": 0.017470772368319842
+    },
+    "cuisine": {
+      "state": "Delhi",
+      "dish_count": 1,
+      "pct_veg": 1,
+      "pct_sweet": 0,
+      "avg_prep_time": 30,
+      "avg_cook_time": 45,
+      "pct_lentil_like": 1,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 0,
+      "pct_fish": 0,
+      "pct_turmeric": 0,
+      "ingredient_stats": {
+        "chickpea": 1,
+        "flour": 1,
+        "yogurt": 1,
+        "oil": 1
+      }
+    }
+  },
+  {
+    "state": "Gujarat",
+    "cancer": {
+      "state": "Gujarat",
+      "incidence_2019": 1100,
+      "incidence_2020": 1125,
+      "incidence_2021": 1150,
+      "incidence_2022": 1180,
+      "incidence_cagr_19_22": 0.023677381203403458
+    },
+    "cuisine": {
+      "state": "Gujarat",
+      "dish_count": 1,
+      "pct_veg": 1,
+      "pct_sweet": 0,
+      "avg_prep_time": 15,
+      "avg_cook_time": 20,
+      "pct_lentil_like": 0,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 0,
+      "pct_fish": 0,
+      "pct_turmeric": 1,
+      "ingredient_stats": {
+        "gram flour": 1,
+        "yogurt": 1,
+        "turmeric": 1,
+        "chili": 1
+      }
+    }
+  },
+  {
+    "state": "Karnataka",
+    "cancer": {
+      "state": "Karnataka",
+      "incidence_2019": 1300,
+      "incidence_2020": 1310,
+      "incidence_2021": 1340,
+      "incidence_2022": 1375,
+      "incidence_cagr_19_22": 0.018872362595751646
+    },
+    "cuisine": {
+      "state": "Karnataka",
+      "dish_count": 2,
+      "pct_veg": 1,
+      "pct_sweet": 0,
+      "avg_prep_time": 257.5,
+      "avg_cook_time": 35,
+      "pct_lentil_like": 0.5,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 0,
+      "pct_fish": 0,
+      "pct_turmeric": 0,
+      "ingredient_stats": {
+        "rice": 2,
+        "urad dal": 1,
+        "salt": 1,
+        "lentil": 1,
+        "tamarind": 1,
+        "vegetables": 1
+      }
+    }
+  },
+  {
+    "state": "Kerala",
+    "cancer": {
+      "state": "Kerala",
+      "incidence_2019": 1400,
+      "incidence_2020": 1420,
+      "incidence_2021": 1450,
+      "incidence_2022": 1490,
+      "incidence_cagr_19_22": 0.020985115898534135
+    },
+    "cuisine": {
+      "state": "Kerala",
+      "dish_count": 2,
+      "pct_veg": 0.5,
+      "pct_sweet": 0,
+      "avg_prep_time": 20,
+      "avg_cook_time": 25,
+      "pct_lentil_like": 0,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 0,
+      "pct_fish": 0.5,
+      "pct_turmeric": 0.5,
+      "ingredient_stats": {
+        "coconut": 2,
+        "fish": 1,
+        "tamarind": 1,
+        "chili": 1,
+        "turmeric": 1,
+        "rice flour": 1
+      }
+    }
+  },
+  {
+    "state": "Maharashtra",
+    "cancer": {
+      "state": "Maharashtra",
+      "incidence_2019": 1600,
+      "incidence_2020": 1620,
+      "incidence_2021": 1650,
+      "incidence_2022": 1700,
+      "incidence_cagr_19_22": 0.020413775479336982
+    },
+    "cuisine": {
+      "state": "Maharashtra",
+      "dish_count": 2,
+      "pct_veg": 1,
+      "pct_sweet": 0,
+      "avg_prep_time": 17.5,
+      "avg_cook_time": 15,
+      "pct_lentil_like": 0,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 0,
+      "pct_fish": 0,
+      "pct_turmeric": 0,
+      "ingredient_stats": {
+        "chili": 2,
+        "potato": 1,
+        "bread": 1,
+        "garlic": 1,
+        "flour": 1,
+        "onion": 1,
+        "spices": 1
+      }
+    }
+  },
+  {
+    "state": "Tamil Nadu",
+    "cancer": {
+      "state": "Tamil Nadu",
+      "incidence_2019": 1350,
+      "incidence_2020": 1365,
+      "incidence_2021": 1380,
+      "incidence_2022": 1400,
+      "incidence_cagr_19_22": 0.012196323958554078
+    },
+    "cuisine": {
+      "state": "Tamil Nadu",
+      "dish_count": 2,
+      "pct_veg": 0.5,
+      "pct_sweet": 0,
+      "avg_prep_time": 30,
+      "avg_cook_time": 30,
+      "pct_lentil_like": 0.5,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 0.5,
+      "pct_fish": 0,
+      "pct_turmeric": 0.5,
+      "ingredient_stats": {
+        "chili": 2,
+        "lentil": 1,
+        "tamarind": 1,
+        "vegetables": 1,
+        "turmeric": 1,
+        "chicken": 1,
+        "curry leaves": 1,
+        "yogurt": 1
+      }
+    }
+  },
+  {
+    "state": "Telangana",
+    "cancer": {
+      "state": "Telangana",
+      "incidence_2019": 1000,
+      "incidence_2020": 1020,
+      "incidence_2021": 1045,
+      "incidence_2022": 1080,
+      "incidence_cagr_19_22": 0.025985568006018145
+    },
+    "cuisine": {
+      "state": "Telangana",
+      "dish_count": 1,
+      "pct_veg": 0,
+      "pct_sweet": 0,
+      "avg_prep_time": 60,
+      "avg_cook_time": 90,
+      "pct_lentil_like": 0,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 1,
+      "pct_fish": 0,
+      "pct_turmeric": 1,
+      "ingredient_stats": {
+        "rice": 1,
+        "chicken": 1,
+        "yogurt": 1,
+        "saffron": 1,
+        "turmeric": 1,
+        "chili": 1
+      }
+    }
+  },
+  {
+    "state": "West Bengal",
+    "cancer": {
+      "state": "West Bengal",
+      "incidence_2019": 1250,
+      "incidence_2020": 1270,
+      "incidence_2021": 1295,
+      "incidence_2022": 1320,
+      "incidence_cagr_19_22": 0.018328673931897743
+    },
+    "cuisine": {
+      "state": "West Bengal",
+      "dish_count": 2,
+      "pct_veg": 1,
+      "pct_sweet": 0.5,
+      "avg_prep_time": 25,
+      "avg_cook_time": 35,
+      "pct_lentil_like": 0,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 0,
+      "pct_fish": 0,
+      "pct_turmeric": 0,
+      "ingredient_stats": {
+        "milk": 1,
+        "yogurt": 1,
+        "sugar": 1,
+        "cardamom": 1,
+        "potato": 1,
+        "poppy seed": 1,
+        "mustard oil": 1
+      }
+    }
+  },
+  {
+    "state": "Punjab",
+    "cancer": null,
+    "cuisine": {
+      "state": "Punjab",
+      "dish_count": 2,
+      "pct_veg": 1,
+      "pct_sweet": 0,
+      "avg_prep_time": 37.5,
+      "avg_cook_time": 37.5,
+      "pct_lentil_like": 0,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 0,
+      "pct_fish": 0,
+      "pct_turmeric": 0,
+      "ingredient_stats": {
+        "corn flour": 2,
+        "mustard greens": 1,
+        "spinach": 1,
+        "ghee": 1,
+        "butter": 1
+      }
+    }
+  },
+  {
+    "state": "Jammu and Kashmir",
+    "cancer": null,
+    "cuisine": {
+      "state": "Jammu and Kashmir",
+      "dish_count": 1,
+      "pct_veg": 0,
+      "pct_sweet": 0,
+      "avg_prep_time": 30,
+      "avg_cook_time": 90,
+      "pct_lentil_like": 0,
+      "pct_red_meat_like": 1,
+      "pct_poultry": 0,
+      "pct_fish": 0,
+      "pct_turmeric": 0,
+      "ingredient_stats": {
+        "mutton": 1,
+        "yogurt": 1,
+        "chili": 1,
+        "ginger": 1,
+        "garlic": 1
+      }
+    }
+  },
+  {
+    "state": "Goa",
+    "cancer": null,
+    "cuisine": {
+      "state": "Goa",
+      "dish_count": 1,
+      "pct_veg": 0,
+      "pct_sweet": 0,
+      "avg_prep_time": 30,
+      "avg_cook_time": 25,
+      "pct_lentil_like": 0,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 0,
+      "pct_fish": 0,
+      "pct_turmeric": 1,
+      "ingredient_stats": {
+        "prawn": 1,
+        "coconut": 1,
+        "chili": 1,
+        "turmeric": 1
+      }
+    }
+  },
+  {
+    "state": "Rajasthan",
+    "cancer": null,
+    "cuisine": {
+      "state": "Rajasthan",
+      "dish_count": 1,
+      "pct_veg": 1,
+      "pct_sweet": 1,
+      "avg_prep_time": 45,
+      "avg_cook_time": 60,
+      "pct_lentil_like": 1,
+      "pct_red_meat_like": 0,
+      "pct_poultry": 0,
+      "pct_fish": 0,
+      "pct_turmeric": 0,
+      "ingredient_stats": {
+        "wheat flour": 1,
+        "lentil": 1,
+        "ghee": 1
+      }
+    }
+  }
+]

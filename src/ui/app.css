@@ -1,0 +1,156 @@
+:root {
+  font-family: 'Inter', system-ui, sans-serif;
+  color: #1f2933;
+  background-color: #f5f7fa;
+}
+
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+
+nav {
+  background: #0f172a;
+  color: white;
+  display: flex;
+  justify-content: center;
+  padding: 0.75rem 1rem;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+nav a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  padding: 0.5rem 1rem;
+  border-radius: 9999px;
+  font-weight: 600;
+}
+
+nav a.active {
+  background: white;
+  color: #0f172a;
+}
+
+#app {
+  padding: 1rem;
+}
+
+.view-container {
+  display: grid;
+  grid-template-columns: 1fr 340px;
+  gap: 1rem;
+}
+
+.panel {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+}
+
+.map-wrapper {
+  background: white;
+  border-radius: 12px;
+  padding: 1rem;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.08);
+}
+
+.state {
+  stroke: #f8fafc;
+  stroke-width: 1;
+  cursor: pointer;
+  transition: fill 0.2s ease;
+}
+
+.state:hover {
+  stroke: #0f172a;
+  stroke-width: 1.5;
+}
+
+.legend-title {
+  font-size: 0.75rem;
+  font-weight: 600;
+  fill: #334155;
+}
+
+.legend-axis text {
+  font-size: 0.7rem;
+}
+
+.scatter-point {
+  fill: #1d4ed8;
+  opacity: 0.8;
+}
+
+.regression-line {
+  fill: none;
+  stroke: #dc2626;
+  stroke-width: 2;
+}
+
+.axis-label {
+  font-size: 0.8rem;
+  fill: #1f2933;
+}
+
+.tooltip {
+  position: absolute;
+  pointer-events: none;
+  background: rgba(15, 23, 42, 0.9);
+  color: white;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  font-size: 0.8rem;
+  box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+}
+
+.panel h2 {
+  margin: 0;
+  font-size: 1.25rem;
+}
+
+.metric-select,
+.year-select,
+.metric-dropdown {
+  padding: 0.5rem;
+  border-radius: 0.5rem;
+  border: 1px solid #cbd5e1;
+  font-size: 0.95rem;
+}
+
+.metric-list {
+  display: grid;
+  gap: 0.5rem;
+}
+
+.metric-card {
+  border: 1px solid #e2e8f0;
+  border-radius: 0.75rem;
+  padding: 0.75rem;
+  background: #f8fafc;
+}
+
+.metric-card strong {
+  display: block;
+  font-size: 0.9rem;
+  color: #0f172a;
+}
+
+.metric-card span {
+  font-size: 0.85rem;
+  color: #475569;
+}
+
+@media (max-width: 960px) {
+  .view-container {
+    grid-template-columns: 1fr;
+  }
+
+  .panel {
+    order: -1;
+  }
+}

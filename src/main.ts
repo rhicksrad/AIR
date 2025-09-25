@@ -255,6 +255,25 @@ Promise.all([loadPlaces(), loadPm(), loadGeography()])
     ui.updateData(derived.counties);
 
     mapPanel.removeChild(loading);
+
+    const mapDescription = document.createElement('div');
+    mapDescription.className =
+      'mb-3 flex flex-col gap-2 rounded-2xl bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-100 shadow-xl backdrop-blur-lg';
+    mapDescription.innerHTML = `
+      <h2 class="text-base font-semibold text-white">How this map works</h2>
+      <p>
+        Each county's Health Burden Index blends CDC PLACES chronic disease measures with the weight sliders on the left.
+        Compare those burdens with long-term PM₂.₅ exposure, or switch to the residual view to see where health outcomes are
+        higher than the pollution-based expectation.
+      </p>
+      <ul class="list-disc space-y-1 pl-5 text-slate-200">
+        <li>Adjust the weights and metric selectors in the sidebar to change what is drawn on the map.</li>
+        <li>Hover over counties for detailed values, search for a place, or jump to outliers flagged by the model.</li>
+        <li>Use the PM₂.₅ window control to compare exposure averages across different time spans.</li>
+      </ul>
+    `;
+    mapPanel.appendChild(mapDescription);
+
     const mapContainer = document.createElement('div');
     mapContainer.className = 'relative h-[600px] min-h-[420px] w-full';
     mapPanel.appendChild(mapContainer);

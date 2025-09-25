@@ -71,10 +71,11 @@ export function combineData(places: PlacesRecord[], pm: PmRecord[]): CountyDatum
         hbi: null,
         exposure: null,
         residual: null,
+        pollutionMinusHealth: null,
         expectedHbi: null,
         hbiZ: null,
         exposureZ: null,
-        percentile: { hbi: null, exposure: null, residual: null },
+        percentile: { hbi: null, exposure: null, residual: null, pollutionMinusHealth: null },
         hasDataGap: false
       } satisfies CountyDatum;
     })

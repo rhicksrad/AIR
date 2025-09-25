@@ -58,16 +58,17 @@ mapColumn.appendChild(metricTabs);
 
 const metricButtons = new Map<MetricKey, HTMLButtonElement>();
 const metricDetails: Record<MetricKey, string> = {
-
   hbi: 'Health',
   exposure: 'Pollution',
-  residual: 'Health minus pollution'
+  residual: 'Health minus pollution',
+  pollutionMinusHealth: 'Pollution minus health'
 };
 (
   [
     { key: 'hbi', helper: 'Weighted mix of chronic disease measures' },
     { key: 'exposure', helper: 'Average fine particle levels' },
-    { key: 'residual', helper: 'Places where illness is higher than pollution alone predicts' }
+    { key: 'residual', helper: 'Places where illness is higher than pollution alone predicts' },
+    { key: 'pollutionMinusHealth', helper: 'Places where illness is lower than pollution alone predicts' }
   ] as { key: MetricKey; helper: string }[]
 ).forEach(({ key, helper }) => {
   const button = document.createElement('button');
@@ -169,7 +170,7 @@ aboutPanel.innerHTML = `
     <div>
       <p class="text-sm font-semibold text-white">How to read this view</p>
       <ul class="mt-2 list-disc space-y-1 pl-5">
-        <li>Tabs above the map switch between Health, air pollution, and the gap between them.</li>
+        <li>Tabs above the map switch between Health, air pollution, and two gap views showing where illness runs higher or lower than expected.</li>
         <li>Click any county to update the table and keep the numbers visible while you explore.</li>
         <li>Use the controls on the right to change the color groupings or tweak the blended index weights.</li>
       </ul>
@@ -230,6 +231,12 @@ function renderCountyDetails(county: CountyDatum | null) {
       helper: `Positive values mean more illness than the pollution-only model predicted. Expected HBI: ${formatNumber(county.expectedHbi)}`,
       value: county.residual,
       percentile: county.percentile.residual
+    },
+    {
+      key: 'pollutionMinusHealth',
+      helper: `Positive values mean less illness than the pollution-only model predicted. Expected HBI: ${formatNumber(county.expectedHbi)}`,
+      value: county.pollutionMinusHealth,
+      percentile: county.percentile.pollutionMinusHealth
     }
   ];
 
@@ -349,20 +356,24 @@ function computeIndices(data: CountyDatum[], weights: WeightConfig, active: Reco
   const exposureZ = computeZScores(exposureSeries);
   const hbiPct = percentileRanks(hbiValues);
   const exposurePct = percentileRanks(exposureSeries);
+  const pollutionMinusHealthValues = residuals.map((value) => (value == null ? null : -value));
   const residualPct = percentileRanks(residuals);
+  const pollutionMinusHealthPct = percentileRanks(pollutionMinusHealthValues);
 
   const counties = data.map((datum, index) => ({
     ...datum,
     hbi: hbiValues[index],
     exposure: exposureSeries[index],
     residual: residuals[index],
+    pollutionMinusHealth: pollutionMinusHealthValues[index],
     expectedHbi: expected[index],
     hbiZ: hbiZ[index],
     exposureZ: exposureZ[index],
     percentile: {
       hbi: hbiPct[index],
       exposure: exposurePct[index],
-      residual: residualPct[index]
+      residual: residualPct[index],
+      pollutionMinusHealth: pollutionMinusHealthPct[index]
     },
     hasDataGap: PLACE_KEYS.some((key) => active[key] && normalizedMeasures[key][index] == null)
   }));
@@ -375,13 +386,14 @@ function computeLegend(metric: MetricKey, data: CountyDatum[], mode: BreakMode) 
     .map((d) => {
       if (metric === 'hbi') return d.hbi;
       if (metric === 'exposure') return d.exposure;
-      return d.residual;
+      if (metric === 'residual') return d.residual;
+      return d.pollutionMinusHealth;
     })
     .filter((v): v is number => v != null && Number.isFinite(v));
   if (values.length === 0) {
     return { bins: [], labels: [] };
   }
-  if (metric === 'residual') {
+  if (metric === 'residual' || metric === 'pollutionMinusHealth') {
     const breaks = symmetricBreaks(values, 5);
     return formatBreaks(breaks);
   }

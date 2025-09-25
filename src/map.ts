@@ -295,8 +295,12 @@ export class CountyMap {
       return d3.scaleThreshold().domain([0]).range([DEFAULT_COLORS.noData]);
     }
     const classes = Math.max(1, bins.length - 1);
-    const colors = this.currentMetric === 'residual'
-      ? d3.quantize((t) => d3.interpolateRdBu(1 - t), classes)
+    const usesDiverging = this.currentMetric === 'residual' || this.currentMetric === 'pollutionMinusHealth';
+    const colors = usesDiverging
+      ? d3.quantize(
+          (t) => d3.interpolateRdBu(this.currentMetric === 'residual' ? 1 - t : t),
+          classes
+        )
       : d3.quantize((t) => d3.interpolateYlOrRd(t * 0.85 + 0.15), classes);
     return d3.scaleThreshold<number, string>().domain(bins.slice(1, -1)).range(colors);
   }
@@ -311,7 +315,7 @@ export class CountyMap {
     const updateFill = (selection: d3.Selection<SVGPathElement, GeoJSON.Feature, SVGGElement, unknown>) => {
       selection.attr('fill', (feature) => {
         const datum = this.data.get((feature.id as string) ?? '');
-        const value = datum ? (metric === 'hbi' ? datum.hbi : metric === 'exposure' ? datum.exposure : datum.residual) : null;
+        const value = datum ? this.getMetricValue(datum) : null;
         if (value == null) {
           return `url(#${this.hatchId})`;
         }
@@ -319,7 +323,7 @@ export class CountyMap {
       });
       selection.attr('data-hatched', (feature) => {
         const datum = this.data.get((feature.id as string) ?? '');
-        const value = datum ? (metric === 'hbi' ? datum.hbi : metric === 'exposure' ? datum.exposure : datum.residual) : null;
+        const value = datum ? this.getMetricValue(datum) : null;
         return value == null ? 'true' : null;
       });
     };
@@ -410,7 +414,8 @@ export class CountyMap {
   private getMetricValue(datum: CountyDatum): number | null {
     if (this.currentMetric === 'hbi') return datum.hbi;
     if (this.currentMetric === 'exposure') return datum.exposure;
-    return datum.residual;
+    if (this.currentMetric === 'residual') return datum.residual;
+    return datum.pollutionMinusHealth;
   }
 
   private applySelection() {

@@ -1,6 +1,6 @@
 # County Health vs Air Quality
 
-Interactive static site that maps chronic disease burdens from CDC PLACES against fine particulate (PM2.5) exposure by U.S. county, highlights outliers, and ships ready for GitHub Pages hosting.
+Interactive static site that maps chronic disease burdens from CDC PLACES against fine particulate (PM2.5) pollution by U.S. county, highlights outliers, and ships ready for GitHub Pages hosting.
 
 ## Quick start
 
@@ -47,7 +47,7 @@ All required data live in the `data/` folder and are versioned in the repository
 ## Method
 
 1. **Data prep**
-   - Coerce all FIPS to five-character strings and left-join CDC PLACES to PM2.5 exposure on FIPS.
+   - Coerce all FIPS to five-character strings and left-join CDC PLACES to pollution on FIPS.
    - Drop counties missing PM2.5 or all selected PLACES measures. Counties with partial PLACES coverage are hatched on the map.
 2. **Health Burden Index (HBI)**
    - User-selectable subset of PLACES variables.

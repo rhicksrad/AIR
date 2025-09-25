@@ -9,6 +9,7 @@ import {
   formatBreaks,
   formatNumber,
   normalizeSeries,
+  normalizeWeights,
   percentileRanks
 } from './stats';
 import { CountyMap } from './map';
@@ -333,6 +334,8 @@ function computeIndices(data: CountyDatum[], weights: WeightConfig, active: Reco
 
   const exposureSeries = normalizeSeries(data.map((d) => d.pm25));
 
+  const normalizedWeights = normalizeWeights(weights, active);
+
   const hbiValues: (number | null)[] = data.map((_d, index) => {
     let sum = 0;
     let hasMissing = false;
@@ -343,7 +346,7 @@ function computeIndices(data: CountyDatum[], weights: WeightConfig, active: Reco
         hasMissing = true;
         break;
       }
-      sum += value * weights[key];
+      sum += value * normalizedWeights[key];
     }
     if (hasMissing) return null;
     return sum;
@@ -441,7 +444,15 @@ function updateVisualization() {
 
 function recalculate() {
   if (!baseCounties.length) return;
-  derived = computeIndices(baseCounties, state.weights, state.activeMeasures);
+  const normalizedWeights = normalizeWeights(state.weights, state.activeMeasures);
+  const weightsChanged = PLACE_KEYS.some((key) =>
+    Math.abs(normalizedWeights[key] - state.weights[key]) > 1e-6
+  );
+  if (weightsChanged) {
+    state.weights = normalizedWeights;
+    ui.updateWeights(normalizedWeights, state.activeMeasures);
+  }
+  derived = computeIndices(baseCounties, normalizedWeights, state.activeMeasures);
   if (state.selectedCounty) {
     const updated = derived.counties.find((county) => county.fips === state.selectedCounty?.fips);
     state.selectedCounty = updated ?? null;

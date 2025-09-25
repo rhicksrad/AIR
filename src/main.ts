@@ -180,15 +180,15 @@ const ui = new UIController(controlPanel, { ...initialWeights }, { ...initialAct
     renderCountyDetails(state.selectedCounty);
   }
 });
-ui.setBreakMode(state.breakMode);
-ui.setBuilderVisibility(state.metric === 'hbi');
-ui.setOutlierVisibility(false);
-setMetric(state.metric);
-
 let derived: DerivedData | null = null;
 let baseCounties: CountyDatum[] = [];
 let mapInstance: CountyMap | null = null;
 let regressionBadge: HTMLDivElement | null = null;
+
+ui.setBreakMode(state.breakMode);
+ui.setBuilderVisibility(state.metric === 'hbi');
+ui.setOutlierVisibility(false);
+setMetric(state.metric);
 
 function withPercent(value: number | null): string {
   const formatted = formatNumber(value);

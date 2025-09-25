@@ -54,30 +54,28 @@ export async function loadGeography(): Promise<GeographyData> {
 
 export function combineData(places: PlacesRecord[], pm: PmRecord[]): CountyDatum[] {
   const pmMap = new Map(pm.map((row) => [row.fips, row.pm25_mean_2016_2024] as const));
-  return places
-    .map((row) => {
-      const pm25 = pmMap.get(row.county_fips) ?? null;
-      return {
-        fips: row.county_fips,
-        county: row.county_name,
-        state: row.state,
-        asthma_pct: row.asthma_pct,
-        copd_pct: row.copd_pct,
-        diabetes_pct: row.diabetes_pct,
-        hypertension_pct: row.hypertension_pct,
-        obesity_pct: row.obesity_pct,
-        smoking_pct: row.smoking_pct,
-        pm25,
-        hbi: null,
-        exposure: null,
-        residual: null,
-        pollutionMinusHealth: null,
-        expectedHbi: null,
-        hbiZ: null,
-        exposureZ: null,
-        percentile: { hbi: null, exposure: null, residual: null, pollutionMinusHealth: null },
-        hasDataGap: false
-      } satisfies CountyDatum;
-    })
-    .filter((row) => row.pm25 !== null);
+  return places.map((row) => {
+    const pm25 = pmMap.get(row.county_fips) ?? null;
+    return {
+      fips: row.county_fips,
+      county: row.county_name,
+      state: row.state,
+      asthma_pct: row.asthma_pct,
+      copd_pct: row.copd_pct,
+      diabetes_pct: row.diabetes_pct,
+      hypertension_pct: row.hypertension_pct,
+      obesity_pct: row.obesity_pct,
+      smoking_pct: row.smoking_pct,
+      pm25,
+      hbi: null,
+      exposure: null,
+      residual: null,
+      pollutionMinusHealth: null,
+      expectedHbi: null,
+      hbiZ: null,
+      exposureZ: null,
+      percentile: { hbi: null, exposure: null, residual: null, pollutionMinusHealth: null },
+      hasDataGap: false
+    } satisfies CountyDatum;
+  });
 }

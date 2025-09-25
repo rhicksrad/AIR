@@ -295,13 +295,14 @@ export class CountyMap {
       return d3.scaleThreshold().domain([0]).range([DEFAULT_COLORS.noData]);
     }
     const classes = Math.max(1, bins.length - 1);
-    const usesDiverging = this.currentMetric === 'residual' || this.currentMetric === 'pollutionMinusHealth';
-    const colors = usesDiverging
-      ? d3.quantize(
-          (t) => d3.interpolateRdBu(this.currentMetric === 'residual' ? 1 - t : t),
-          classes
-        )
-      : d3.quantize((t) => d3.interpolateYlOrRd(t * 0.85 + 0.15), classes);
+    let colors: string[];
+    if (this.currentMetric === 'residual') {
+      colors = d3.quantize((t) => d3.interpolateYlOrRd(t), classes);
+    } else if (this.currentMetric === 'pollutionMinusHealth') {
+      colors = d3.quantize((t) => d3.interpolateYlGn(t), classes);
+    } else {
+      colors = d3.quantize((t) => d3.interpolateYlOrRd(t * 0.85 + 0.15), classes);
+    }
     return d3.scaleThreshold<number, string>().domain(bins.slice(1, -1)).range(colors);
   }
 
@@ -414,8 +415,15 @@ export class CountyMap {
   private getMetricValue(datum: CountyDatum): number | null {
     if (this.currentMetric === 'hbi') return datum.hbi;
     if (this.currentMetric === 'exposure') return datum.exposure;
-    if (this.currentMetric === 'residual') return datum.residual;
-    return datum.pollutionMinusHealth;
+    if (this.currentMetric === 'residual') {
+      return datum.residual != null && datum.residual > 0 ? datum.residual : null;
+    }
+    if (this.currentMetric === 'pollutionMinusHealth') {
+      return datum.pollutionMinusHealth != null && datum.pollutionMinusHealth > 0
+        ? datum.pollutionMinusHealth
+        : null;
+    }
+    return null;
   }
 
   private applySelection() {

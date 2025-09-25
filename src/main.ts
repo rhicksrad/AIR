@@ -25,19 +25,19 @@ if (!app) {
   throw new Error('App container not found');
 }
 
-app.className = 'relative mx-auto flex min-h-screen w-full max-w-none flex-col gap-10 px-5 py-10 text-slate-100 xl:px-12';
+app.className = 'relative mx-auto flex min-h-screen w-full max-w-none flex-col gap-10 px-5 py-10 text-white xl:px-12';
 
 const glow = document.createElement('div');
 glow.className =
-  'pointer-events-none absolute inset-0 -z-10 rounded-[48px] border border-white/10 bg-gradient-to-br from-white/5 via-transparent to-primary/10 shadow-[0_50px_140px_-60px_rgba(30,64,175,0.7)]';
+  'pointer-events-none absolute inset-0 -z-10 rounded-[48px] border border-white/10 bg-gradient-to-br from-white/5 via-transparent to-primary/20 shadow-[0_60px_160px_-70px_rgba(53,94,59,0.8)]';
 app.appendChild(glow);
 
 const header = document.createElement('header');
-header.className = 'flex flex-col gap-4 text-slate-200';
+header.className = 'flex flex-col gap-4 text-white/80';
 header.innerHTML = `
   <span class="section-heading">Air &amp; health</span>
   <h1 class="text-4xl font-semibold leading-tight text-white">Where dirty air and chronic illness overlap</h1>
-  <p class="max-w-3xl text-base leading-relaxed text-slate-200">
+  <p class="max-w-3xl text-base leading-relaxed text-white/80">
     Use this explorer to see how long-term fine particle pollution relates to chronic disease burdens. Pick a map view below,
     then click a county to read its numbers in the table under the map.
   </p>
@@ -87,14 +87,14 @@ const metricDetails: Record<MetricKey, string> = {
 
 const mapPanel = document.createElement('div');
 mapPanel.className =
-  'relative flex min-h-[640px] flex-1 overflow-hidden rounded-[48px] border border-white/10 bg-slate-950/60 shadow-[0_80px_200px_-80px_rgba(15,23,42,1)] backdrop-blur-2xl xl:min-h-[760px]';
+  'relative flex min-h-[640px] flex-1 overflow-hidden rounded-[48px] border border-white/10 bg-black/70 shadow-[0_80px_200px_-90px_rgba(15,35,24,0.9)] backdrop-blur-2xl xl:min-h-[760px]';
 mapColumn.appendChild(mapPanel);
 
 const controlPanel = document.createElement('aside');
 controlPanel.className = 'relative z-10 w-full';
 
 const loading = document.createElement('div');
-loading.className = 'flex h-full w-full items-center justify-center text-sm font-medium text-slate-300';
+loading.className = 'flex h-full w-full items-center justify-center text-sm font-medium text-white/70';
 loading.textContent = 'Loading county and pollution data…';
 mapPanel.appendChild(loading);
 
@@ -107,7 +107,7 @@ detailsCard.className = 'card flex flex-col gap-4';
 detailsCard.innerHTML = `
   <div class="flex flex-col gap-1">
     <span class="section-heading">County snapshot</span>
-    <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Click a county to read the data</h2>
+    <h2 class="text-lg font-semibold text-white">Click a county to read the data</h2>
   </div>
   <div class="county-details" data-role="county-details"></div>
 `;
@@ -118,13 +118,13 @@ mapColumn.appendChild(controlPanel);
 const detailsBody = detailsCard.querySelector('[data-role="county-details"]') as HTMLDivElement;
 
 const helperNote = document.createElement('div');
-helperNote.className = 'panel-surface text-sm leading-relaxed text-slate-600 dark:text-slate-200';
+helperNote.className = 'panel-surface text-sm leading-relaxed text-white/80';
 helperNote.innerHTML = `
-  <p class="text-sm font-semibold text-slate-900 dark:text-white">How to read this view</p>
+  <p class="text-sm font-semibold text-white">How to read this view</p>
   <ul class="mt-2 list-disc space-y-1 pl-5">
     <li>Tabs above the map switch between Health, air pollution, and the gap between them.</li>
     <li>Click any county to update the table and keep the numbers visible while you explore.</li>
-    <li>Use the controls on the right to change the color groupings, search for a place, or tweak the blended index weights.</li>
+    <li>Use the controls on the right to change the color groupings or tweak the blended index weights.</li>
   </ul>
 `;
 mapColumn.appendChild(helperNote);
@@ -150,19 +150,6 @@ const ui = new UIController(controlPanel, { ...initialWeights }, { ...initialAct
     state.weights = weights;
     state.activeMeasures = active;
     recalculate();
-  },
-  onSearch: (fips) => {
-    if (!mapInstance) return;
-    mapInstance.focusOnCounty(fips);
-    mapInstance.flashCounty(fips);
-    if (derived) {
-      const target = derived.counties.find((county) => county.fips === fips);
-      if (target) {
-        state.selectedCounty = target;
-        renderCountyDetails(target);
-        mapInstance.setSelectedCounty(target.fips);
-      }
-    }
   },
   onOutlierSelect: (fips) => {
     if (!mapInstance) return;
@@ -201,7 +188,7 @@ function renderCountyDetails(county: CountyDatum | null) {
   if (!detailsBody) return;
   if (!county) {
     detailsBody.innerHTML = `
-      <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+      <p class="text-sm leading-relaxed text-white/70">
         Click any county on the map to see its chronic disease burdens, pollution levels, and percentile ranks.
       </p>
     `;
@@ -239,15 +226,15 @@ function renderCountyDetails(county: CountyDatum | null) {
   };
 
   detailsBody.innerHTML = `
-    <div class="rounded-2xl border border-white/10 bg-white/60 p-4 text-slate-700 shadow-inner dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-100">
+    <div class="rounded-2xl border border-white/10 bg-black/40 p-4 text-white/80 shadow-inner backdrop-blur">
       <div class="flex flex-wrap items-baseline justify-between gap-2">
-        <h3 class="text-xl font-semibold text-slate-900 dark:text-white">${county.county}, ${county.state}</h3>
-        <span class="text-xs font-mono text-slate-500 dark:text-slate-300">${county.fips}</span>
+        <h3 class="text-xl font-semibold text-white">${county.county}, ${county.state}</h3>
+        <span class="text-xs font-mono text-white/60">${county.fips}</span>
       </div>
-      <p class="text-xs text-slate-500 dark:text-slate-300">PM₂.₅ averaging window: ${state.pmYearLabel}</p>
+      <p class="text-xs text-white/60">PM₂.₅ averaging window: ${state.pmYearLabel}</p>
       ${county.hasDataGap ? '<p class="mt-1 text-xs text-amber-500">One or more health measures are missing for this county.</p>' : ''}
     </div>
-    <div class="overflow-hidden rounded-2xl border border-white/10 bg-white/70 shadow-inner dark:border-white/10 dark:bg-slate-900/50">
+    <div class="overflow-hidden rounded-2xl border border-white/10 bg-black/40 shadow-inner backdrop-blur">
       <table class="county-table">
         <thead>
           <tr>
@@ -278,11 +265,11 @@ function renderCountyDetails(county: CountyDatum | null) {
       </table>
     </div>
     <div class="panel-surface flex flex-col gap-2">
-      <p class="text-sm font-semibold text-slate-900 dark:text-white">Chronic disease inputs</p>
+      <p class="text-sm font-semibold text-white">Chronic disease inputs</p>
       <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2">
         ${PLACE_KEYS.map((key) => `
-          <li class="flex flex-col gap-0.5 text-sm text-slate-600 dark:text-slate-200">
-            <span class="font-semibold text-slate-900 dark:text-white">${placeLabels[key]}</span>
+          <li class="flex flex-col gap-0.5 text-sm text-white/70">
+            <span class="font-semibold text-white">${placeLabels[key]}</span>
             <span>${withPercent((county[key] as number | null) ?? null)}</span>
           </li>
         `).join('')}
@@ -440,7 +427,7 @@ Promise.all([loadPlaces(), loadPm(), loadGeography()])
     mapPanel.appendChild(mapContainer);
 
     regressionBadge = document.createElement('div');
-    regressionBadge.className = 'pointer-events-none absolute bottom-4 left-4 z-10 flex items-center gap-2 rounded-lg bg-slate-900/80 px-3 py-2 text-xs font-medium text-slate-100 shadow-lg';
+    regressionBadge.className = 'pointer-events-none absolute bottom-4 left-4 z-10 flex items-center gap-2 rounded-lg bg-black/70 px-3 py-2 text-xs font-medium text-white/80 shadow-lg';
     mapPanel.appendChild(regressionBadge);
 
     mapInstance = new CountyMap(mapContainer, geography, undefined, {

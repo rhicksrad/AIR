@@ -6,7 +6,6 @@ import { formatNumber, normalizeWeights } from './stats';
 interface UIOptions {
   onBreakModeChange: (mode: BreakMode) => void;
   onWeightsChange: (weights: WeightConfig, active: Record<PlaceKey, boolean>) => void;
-  onSearch: (query: string) => void;
   onOutlierSelect: (fips: string) => void;
   onPmLabelChange: (label: string) => void;
 }
@@ -65,19 +64,19 @@ function createWeightControls(
     const row = wrapper.append('div').attr('class', 'group panel-surface flex flex-col gap-3');
     const labelRow = row
       .append('label')
-      .attr('class', 'flex items-center justify-between gap-3 text-sm font-semibold text-slate-700 dark:text-slate-200');
+      .attr('class', 'flex items-center justify-between gap-3 text-sm font-semibold text-white/80');
     const label = key
       .replace('_pct', '')
       .replace('copd', 'COPD')
       .replace('hbi', 'HBI');
     labelRow
       .append('span')
-      .attr('class', 'text-base font-semibold capitalize text-slate-900 dark:text-white')
+      .attr('class', 'text-base font-semibold capitalize text-white')
       .text(label.replace(/_/g, ' '));
     const toggle = labelRow
       .append('input')
       .attr('type', 'checkbox')
-      .attr('class', 'h-4 w-4 rounded border border-white/40 bg-white/80 text-primary shadow-sm transition focus-visible:ring-2 focus-visible:ring-primary/40 dark:border-white/10 dark:bg-slate-900/80')
+      .attr('class', 'h-4 w-4 rounded border border-white/30 bg-black/40 text-primary shadow-sm transition focus-visible:ring-2 focus-visible:ring-primary/40')
       .property('checked', active[key])
       .on('change', (event) => {
         active[key] = (event.currentTarget as HTMLInputElement).checked;
@@ -114,18 +113,6 @@ function createWeightControls(
   });
 }
 
-function searchMatches(data: CountyDatum[], query: string): CountyDatum[] {
-  const q = query.trim().toLowerCase();
-  if (!q) return [];
-  return data
-    .filter((county) =>
-      county.county.toLowerCase().includes(q) ||
-      county.state.toLowerCase().includes(q) ||
-      county.fips.includes(q)
-    )
-    .slice(0, 10);
-}
-
 export class UIController {
   private container: HTMLElement;
 
@@ -134,10 +121,6 @@ export class UIController {
   private breakButtons = new Map<BreakMode, HTMLButtonElement>();
 
   private weightPanel: HTMLElement;
-
-  private searchInput: HTMLInputElement;
-
-  private searchResults: HTMLElement;
 
   private outlierList: HTMLElement;
 
@@ -162,14 +145,14 @@ export class UIController {
     this.weights = weights;
     this.active = active;
     this.options = options;
-    this.container.classList.add('card', 'flex', 'w-full', 'flex-col', 'gap-8', 'text-slate-900', 'dark:text-slate-100');
+    this.container.classList.add('card', 'flex', 'w-full', 'flex-col', 'gap-8', 'text-white');
     this.container.innerHTML = '';
 
     const title = document.createElement('div');
     title.className = 'flex flex-col gap-2';
     title.innerHTML = `
       <span class="section-heading">Environmental health explorer</span>
-      <h1 class="text-3xl font-semibold leading-tight text-transparent bg-gradient-to-r from-slate-900 via-primary/80 to-emerald-400 bg-clip-text dark:from-white dark:via-primary/80 dark:to-emerald-300">County Health vs Air Quality</h1>
+      <h1 class="text-3xl font-semibold leading-tight text-transparent bg-gradient-to-r from-white via-[#4c8f60] to-[#1b3925] bg-clip-text">County Health vs Air Quality</h1>
       <p class="input-description">Explore CDC PLACES chronic disease burdens alongside pollution to spot elevated health burdens across the United States.</p>
     `;
     this.container.appendChild(title);
@@ -222,7 +205,7 @@ export class UIController {
       <div class="flex items-start justify-between gap-3">
         <div class="flex flex-col gap-1">
           <span class="section-heading">Custom index</span>
-          <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Blend the health measures</h2>
+          <h2 class="text-lg font-semibold text-white">Blend the health measures</h2>
         </div>
         <button type="button" class="btn-pill">Reset</button>
       </div>
@@ -245,45 +228,13 @@ export class UIController {
     contentGrid.appendChild(this.builderSection);
     this.renderWeightPanel();
 
-    const searchGroup = document.createElement('div');
-    searchGroup.className = 'panel-surface flex flex-col gap-3 xl:col-span-4';
-    searchGroup.innerHTML = `
-      <label class="control-label">Search counties</label>
-      <input type="search" class="form-control" placeholder="Type a county or FIPS" />
-      <div class="flex flex-col gap-2" data-role="search-results"></div>
-    `;
-    this.searchInput = searchGroup.querySelector('input') as HTMLInputElement;
-    this.searchResults = searchGroup.querySelector('[data-role="search-results"]') as HTMLElement;
-    this.searchInput.addEventListener('input', () => {
-      const query = this.searchInput.value;
-      if (!query) {
-        this.searchResults.innerHTML = '';
-        return;
-      }
-      const matches = searchMatches(this.data, query);
-      this.searchResults.innerHTML = matches
-        .map(
-          (county) =>
-            `<button type="button" data-fips="${county.fips}" class="search-result">${county.county}, ${county.state} <span>${county.fips}</span></button>`
-        )
-        .join('');
-    });
-    this.searchResults.addEventListener('click', (event) => {
-      const target = event.target as HTMLElement;
-      const button = target.closest('button[data-fips]') as HTMLButtonElement | null;
-      if (!button) return;
-      this.options.onSearch(button.dataset.fips ?? '');
-      this.searchResults.innerHTML = '';
-    });
-    contentGrid.appendChild(searchGroup);
-
     this.outlierSection = document.createElement('div');
     this.outlierSection.className = 'panel-surface flex flex-col gap-4 xl:col-span-4';
     this.outlierSection.innerHTML = `
       <div class="flex items-start justify-between gap-3">
         <div class="flex flex-col gap-1">
           <span class="section-heading">Signal counties</span>
-          <h2 class="text-lg font-semibold text-slate-900 dark:text-white">High-burden outliers</h2>
+          <h2 class="text-lg font-semibold text-white">High-burden outliers</h2>
         </div>
         <button type="button" class="btn-primary">Export CSV</button>
       </div>
@@ -298,9 +249,9 @@ export class UIController {
 
     const notes = document.createElement('div');
     notes.className =
-      'rounded-2xl border border-white/10 bg-white/50 p-4 text-xs leading-relaxed text-slate-600 shadow-inner dark:border-white/10 dark:bg-slate-900/50 dark:text-slate-200 xl:col-span-4';
+      'rounded-2xl border border-white/10 bg-white/5 p-4 text-xs leading-relaxed text-white/80 shadow-inner backdrop-blur xl:col-span-4';
     notes.innerHTML = `
-      <p class="text-sm font-semibold text-slate-900 dark:text-white">Data notes</p>
+      <p class="text-sm font-semibold text-white">Data notes</p>
       <ul class="mt-2 list-disc space-y-1 pl-4">
         <li>CDC PLACES 2024 release (crude prevalence) for chronic conditions.</li>
         <li>EPA Air Quality System PM₂.₅ monitor annual means averaged across available monitors.</li>
@@ -359,13 +310,13 @@ export class UIController {
     this.outlierList.innerHTML = outliers
       .map(
         (item) => `
-        <button type="button" data-fips="${item.fips}" class="group flex flex-col gap-2 rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-left text-xs text-slate-700 shadow-sm transition hover:border-primary/50 hover:bg-primary/10 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-100">
+        <button type="button" data-fips="${item.fips}" class="group flex flex-col gap-2 rounded-2xl border border-white/10 bg-black/40 px-4 py-3 text-left text-xs text-white/80 shadow-sm transition hover:border-primary/60 hover:bg-primary/20">
           <div class="flex items-center justify-between gap-2">
             <span class="text-sm font-semibold">${item.county}, ${item.state}</span>
-            <span class="font-mono text-[11px] text-slate-400">${item.fips}</span>
+            <span class="font-mono text-[11px] text-white/50">${item.fips}</span>
           </div>
-          <div class="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-500 transition group-hover:text-slate-600 dark:text-slate-300 dark:group-hover:text-slate-200">
-            <span>Residual: <strong class="text-slate-900 dark:text-white">${formatNumber(item.residual)}</strong></span>
+          <div class="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-white/60 transition group-hover:text-white">
+            <span>Residual: <strong class="text-white">${formatNumber(item.residual)}</strong></span>
             <span>Exposure: ${formatNumber(item.exposure)}</span>
             <span>HBI: ${formatNumber(item.hbi)}</span>
           </div>

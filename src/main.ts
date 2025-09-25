@@ -9,8 +9,7 @@ import {
   formatBreaks,
   formatNumber,
   normalizeSeries,
-  percentileRanks,
-  symmetricBreaks
+  percentileRanks
 } from './stats';
 import { CountyMap } from './map';
 import { UIController } from './ui';
@@ -394,8 +393,16 @@ function computeLegend(metric: MetricKey, data: CountyDatum[], mode: BreakMode) 
     return { bins: [], labels: [] };
   }
   if (metric === 'residual' || metric === 'pollutionMinusHealth') {
-    const breaks = symmetricBreaks(values, 5);
-    return formatBreaks(breaks);
+    const positives = values.filter((v) => v > 0);
+    if (positives.length === 0) {
+      return { bins: [], labels: [] };
+    }
+    const sequential = computeBreaks(positives, mode);
+    if (sequential.bins.length < 2) {
+      return sequential;
+    }
+    const bins = [0, ...sequential.bins.slice(1)];
+    return formatBreaks(bins);
   }
   return computeBreaks(values, mode);
 }

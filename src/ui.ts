@@ -61,22 +61,24 @@ function createWeightControls(
   active: Record<PlaceKey, boolean>,
   onChange: (nextWeights: WeightConfig, nextActive: Record<PlaceKey, boolean>) => void
 ) {
-  const wrapper = d3.select(container).append('div').attr('class', 'flex flex-col gap-3');
+  const wrapper = d3.select(container).append('div').attr('class', 'flex flex-col gap-4');
   PLACE_KEYS.forEach((key) => {
-    const row = wrapper.append('div').attr('class', 'flex flex-col gap-1');
-    const labelRow = row.append('label').attr('class', 'flex items-center justify-between gap-3 text-sm font-medium');
+    const row = wrapper.append('div').attr('class', 'group panel-surface flex flex-col gap-3');
+    const labelRow = row
+      .append('label')
+      .attr('class', 'flex items-center justify-between gap-3 text-sm font-semibold text-slate-700 dark:text-slate-200');
     const label = key
       .replace('_pct', '')
       .replace('copd', 'COPD')
       .replace('hbi', 'HBI');
     labelRow
       .append('span')
-      .attr('class', 'capitalize')
+      .attr('class', 'text-base font-semibold capitalize text-slate-900 dark:text-white')
       .text(label.replace(/_/g, ' '));
     const toggle = labelRow
       .append('input')
       .attr('type', 'checkbox')
-      .attr('class', 'h-4 w-4 accent-primary')
+      .attr('class', 'h-4 w-4 rounded border border-white/40 bg-white/80 text-primary shadow-sm transition focus-visible:ring-2 focus-visible:ring-primary/40 dark:border-white/10 dark:bg-slate-900/80')
       .property('checked', active[key])
       .on('change', (event) => {
         active[key] = (event.currentTarget as HTMLInputElement).checked;
@@ -84,14 +86,14 @@ function createWeightControls(
         onChange(normalized, { ...active });
       });
 
-    const controlRow = row.append('div').attr('class', 'flex items-center gap-3');
+    const controlRow = row.append('div').attr('class', 'flex items-center gap-4');
     const slider = controlRow
       .append('input')
       .attr('type', 'range')
       .attr('min', 0)
       .attr('max', 100)
       .attr('step', 1)
-      .attr('class', 'w-full accent-primary')
+      .attr('class', 'w-full')
       .property('value', Math.round(weights[key] * 100))
       .property('disabled', !active[key])
       .on('input', (event) => {
@@ -102,7 +104,7 @@ function createWeightControls(
       });
     controlRow
       .append('span')
-      .attr('class', 'w-10 text-right text-xs font-semibold tabular-nums text-slate-500')
+      .attr('class', 'weight-percent')
       .text(`${Math.round(weights[key] * 100)}%`);
 
     toggle.on('change.weight', () => {
@@ -161,22 +163,23 @@ export class UIController {
     this.weights = weights;
     this.active = active;
     this.options = options;
-    this.container.classList.add('card', 'flex', 'max-w-sm', 'flex-col', 'gap-6');
+    this.container.classList.add('card', 'flex', 'max-w-sm', 'flex-col', 'gap-7', 'text-slate-900', 'dark:text-slate-100');
     this.container.innerHTML = '';
 
     const title = document.createElement('div');
-    title.className = 'flex flex-col gap-1';
+    title.className = 'flex flex-col gap-2';
     title.innerHTML = `
-      <h1 class="text-2xl font-semibold text-slate-900 dark:text-slate-100">County Health vs Air Quality</h1>
-      <p class="text-sm text-slate-600 dark:text-slate-300">Explore CDC PLACES chronic disease burdens alongside PM₂.₅ exposure.</p>
+      <span class="section-heading">Environmental health explorer</span>
+      <h1 class="text-3xl font-semibold leading-tight text-transparent bg-gradient-to-r from-slate-900 via-primary/80 to-emerald-400 bg-clip-text dark:from-white dark:via-primary/80 dark:to-emerald-300">County Health vs Air Quality</h1>
+      <p class="input-description">Explore CDC PLACES chronic disease burdens alongside PM₂.₅ exposure to spot elevated health burdens across the United States.</p>
     `;
     this.container.appendChild(title);
 
     const metricGroup = document.createElement('div');
-    metricGroup.className = 'flex flex-col gap-2';
+    metricGroup.className = 'panel-surface flex flex-col gap-2';
     metricGroup.innerHTML = `
-      <label class="text-sm font-semibold">Map metric</label>
-      <select class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900">
+      <label class="control-label">Map metric</label>
+      <select class="form-control">
         <option value="hbi">Health Burden Index</option>
         <option value="exposure">Exposure Index</option>
         <option value="residual">Residual (HBI - Expected)</option>
@@ -191,10 +194,10 @@ export class UIController {
     this.container.appendChild(metricGroup);
 
     const breakGroup = document.createElement('div');
-    breakGroup.className = 'flex flex-col gap-2';
+    breakGroup.className = 'panel-surface flex flex-col gap-2';
     breakGroup.innerHTML = `
-      <label class="text-sm font-semibold">Class breaks</label>
-      <select class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900">
+      <label class="control-label">Class breaks</label>
+      <select class="form-control">
         <option value="quantile">Quantile (quintiles)</option>
         <option value="equal">Equal interval</option>
         <option value="jenks">Jenks (k-means)</option>
@@ -207,23 +210,26 @@ export class UIController {
     this.container.appendChild(breakGroup);
 
     const pmLabelGroup = document.createElement('div');
-    pmLabelGroup.className = 'flex flex-col gap-2';
+    pmLabelGroup.className = 'panel-surface flex flex-col gap-2';
     pmLabelGroup.innerHTML = `
-      <label class="text-sm font-semibold">PM₂.₅ averaging window</label>
-      <input type="text" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900" placeholder="2016–2024" value="2016–2024" />
+      <label class="control-label">PM₂.₅ averaging window</label>
+      <input type="text" class="form-control" placeholder="2016–2024" value="2016–2024" />
     `;
     this.pmLabelInput = pmLabelGroup.querySelector('input') as HTMLInputElement;
     this.pmLabelInput.addEventListener('input', () => this.options.onPmLabelChange(this.pmLabelInput.value || '2016–2024'));
     this.container.appendChild(pmLabelGroup);
 
     const builder = document.createElement('div');
-    builder.className = 'flex flex-col gap-3';
+    builder.className = 'flex flex-col gap-4';
     builder.innerHTML = `
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm font-semibold">Health Burden Builder</h2>
-        <button type="button" class="text-xs font-medium text-primary hover:underline">Reset weights</button>
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex flex-col gap-1">
+          <span class="section-heading">Custom index</span>
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Health Burden Builder</h2>
+        </div>
+        <button type="button" class="btn-pill">Reset</button>
       </div>
-      <p class="text-xs text-slate-500 dark:text-slate-400">Select CDC PLACES measures and adjust their influence on the index. Weights re-normalize automatically.</p>
+      <p class="input-description">Select CDC PLACES measures and adjust their influence on the index. Weights re-normalize automatically.</p>
     `;
     const resetButton = builder.querySelector('button') as HTMLButtonElement;
     resetButton.addEventListener('click', () => {
@@ -239,19 +245,19 @@ export class UIController {
     this.container.appendChild(builder);
 
     this.weightPanel = document.createElement('div');
-    this.weightPanel.className = 'flex flex-col gap-3';
+    this.weightPanel.className = 'flex flex-col gap-4';
     this.container.appendChild(this.weightPanel);
     this.renderWeightPanel();
 
     const searchGroup = document.createElement('div');
-    searchGroup.className = 'flex flex-col gap-2';
+    searchGroup.className = 'panel-surface flex flex-col gap-3';
     searchGroup.innerHTML = `
-      <label class="text-sm font-semibold">Search counties</label>
-      <input type="search" class="rounded-lg border border-slate-300 bg-white px-3 py-2 text-sm dark:border-slate-700 dark:bg-slate-900" placeholder="Type a county or FIPS" />
-      <div class="flex flex-col gap-1 text-xs text-slate-500"></div>
+      <label class="control-label">Search counties</label>
+      <input type="search" class="form-control" placeholder="Type a county or FIPS" />
+      <div class="flex flex-col gap-2" data-role="search-results"></div>
     `;
     this.searchInput = searchGroup.querySelector('input') as HTMLInputElement;
-    this.searchResults = searchGroup.querySelector('div') as HTMLElement;
+    this.searchResults = searchGroup.querySelector('[data-role="search-results"]') as HTMLElement;
     this.searchInput.addEventListener('input', () => {
       const query = this.searchInput.value;
       if (!query) {
@@ -260,7 +266,10 @@ export class UIController {
       }
       const matches = searchMatches(this.data, query);
       this.searchResults.innerHTML = matches
-        .map((county) => `<button type="button" data-fips="${county.fips}" class="rounded px-2 py-1 text-left hover:bg-slate-200/70 dark:hover:bg-slate-800/70">${county.county}, ${county.state} <span class="font-mono text-[11px] text-slate-400">${county.fips}</span></button>`)
+        .map(
+          (county) =>
+            `<button type="button" data-fips="${county.fips}" class="search-result">${county.county}, ${county.state} <span>${county.fips}</span></button>`
+        )
         .join('');
     });
     this.searchResults.addEventListener('click', (event) => {
@@ -273,26 +282,29 @@ export class UIController {
     this.container.appendChild(searchGroup);
 
     this.outlierSection = document.createElement('div');
-    this.outlierSection.className = 'flex flex-col gap-3';
+    this.outlierSection.className = 'panel-surface flex flex-col gap-4';
     this.outlierSection.innerHTML = `
-      <div class="flex items-center justify-between">
-        <h2 class="text-sm font-semibold">High-burden outliers</h2>
-        <button type="button" class="rounded bg-primary px-3 py-1 text-xs font-semibold text-white shadow hover:bg-blue-600">Export CSV</button>
+      <div class="flex items-start justify-between gap-3">
+        <div class="flex flex-col gap-1">
+          <span class="section-heading">Signal counties</span>
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-white">High-burden outliers</h2>
+        </div>
+        <button type="button" class="btn-primary">Export CSV</button>
       </div>
-      <p class="text-xs text-slate-500 dark:text-slate-400">Counties whose observed burden exceeds the regression expectation given PM₂.₅.</p>
-      <div class="flex max-h-64 flex-col gap-1 overflow-y-auto"></div>
+      <p class="input-description">Counties whose observed burden exceeds the regression expectation given PM₂.₅.</p>
+      <div class="flex max-h-64 flex-col gap-2 overflow-y-auto pr-1" data-role="outlier-list"></div>
     `;
     this.outlierButton = this.outlierSection.querySelector('button') as HTMLButtonElement;
-    this.outlierList = this.outlierSection.querySelector('div.flex.max-h-64') as HTMLElement;
+    this.outlierList = this.outlierSection.querySelector('[data-role="outlier-list"]') as HTMLElement;
     this.outlierButton.addEventListener('click', () => this.exportOutliers());
     this.container.appendChild(this.outlierSection);
     this.toggleOutliers(false);
 
     const notes = document.createElement('div');
-    notes.className = 'rounded-lg bg-slate-100/60 p-3 text-xs leading-relaxed text-slate-600 dark:bg-slate-800/60 dark:text-slate-300';
+    notes.className = 'rounded-2xl border border-white/10 bg-white/50 p-4 text-xs leading-relaxed text-slate-600 shadow-inner dark:border-white/10 dark:bg-slate-900/50 dark:text-slate-200';
     notes.innerHTML = `
-      <p class="font-semibold">Data notes</p>
-      <ul class="mt-1 list-disc space-y-1 pl-4">
+      <p class="text-sm font-semibold text-slate-900 dark:text-white">Data notes</p>
+      <ul class="mt-2 list-disc space-y-1 pl-4">
         <li>CDC PLACES 2024 release (crude prevalence) for chronic conditions.</li>
         <li>EPA Air Quality System PM₂.₅ monitor annual means averaged across available monitors.</li>
         <li>Residuals derive from an ordinary least squares fit of HBI on PM₂.₅ exposure.</li>
@@ -341,16 +353,19 @@ export class UIController {
   updateOutliers(outliers: Outlier[]) {
     this.currentOutliers = outliers;
     if (!outliers.length) {
-      this.outlierList.innerHTML = '<p class="text-xs text-slate-500">No counties exceed the expected burden for the selected configuration.</p>';
+      this.outlierList.innerHTML = '<p class="input-description">No counties exceed the expected burden for the selected configuration.</p>';
       return;
     }
     this.outlierList.innerHTML = outliers
       .map(
         (item) => `
-        <button type="button" data-fips="${item.fips}" class="flex flex-col gap-1 rounded border border-slate-200 px-3 py-2 text-left text-xs hover:border-primary hover:bg-slate-100/70 dark:border-slate-700 dark:hover:border-primary/70 dark:hover:bg-slate-800/70">
-          <div class="flex items-center justify-between"><span class="font-semibold">${item.county}, ${item.state}</span><span class="font-mono text-[11px] text-slate-400">${item.fips}</span></div>
-          <div class="flex flex-wrap gap-x-3">
-            <span>Residual: <strong>${formatNumber(item.residual)}</strong></span>
+        <button type="button" data-fips="${item.fips}" class="group flex flex-col gap-2 rounded-2xl border border-white/20 bg-white/70 px-4 py-3 text-left text-xs text-slate-700 shadow-sm transition hover:border-primary/50 hover:bg-primary/10 dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-100">
+          <div class="flex items-center justify-between gap-2">
+            <span class="text-sm font-semibold">${item.county}, ${item.state}</span>
+            <span class="font-mono text-[11px] text-slate-400">${item.fips}</span>
+          </div>
+          <div class="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-slate-500 transition group-hover:text-slate-600 dark:text-slate-300 dark:group-hover:text-slate-200">
+            <span>Residual: <strong class="text-slate-900 dark:text-white">${formatNumber(item.residual)}</strong></span>
             <span>Exposure: ${formatNumber(item.exposure)}</span>
             <span>HBI: ${formatNumber(item.hbi)}</span>
           </div>

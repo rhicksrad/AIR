@@ -26,23 +26,32 @@ if (!app) {
   throw new Error('App container not found');
 }
 
-app.className = 'flex min-h-screen flex-col gap-6 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950 p-4 text-slate-100';
+app.className = 'relative mx-auto flex min-h-screen w-full max-w-[1600px] flex-col gap-10 px-6 py-10 text-slate-100';
+
+const glow = document.createElement('div');
+glow.className =
+  'pointer-events-none absolute inset-0 -z-10 rounded-[48px] border border-white/10 bg-gradient-to-br from-white/5 via-transparent to-primary/10 shadow-[0_50px_140px_-60px_rgba(30,64,175,0.7)]';
+app.appendChild(glow);
 
 const layout = document.createElement('div');
-layout.className = 'mx-auto flex w-full max-w-[1440px] flex-1 flex-col gap-4 lg:flex-row';
+layout.className = 'relative grid flex-1 grid-cols-1 gap-6 xl:grid-cols-[420px_1fr] xl:items-start';
 app.appendChild(layout);
 
 const controlPanel = document.createElement('aside');
 const mapPanel = document.createElement('section');
-mapPanel.className = 'relative flex-1 overflow-hidden rounded-2xl bg-slate-200/20 shadow-2xl ring-1 ring-slate-100/10 dark:bg-slate-900/40';
-controlPanel.className = 'w-full lg:w-96';
+mapPanel.className =
+  'relative flex min-h-[600px] flex-1 overflow-hidden rounded-3xl border border-white/10 bg-slate-900/50 shadow-[0_40px_120px_-60px_rgba(15,23,42,1)] backdrop-blur-2xl';
+controlPanel.className = 'w-full xl:w-[420px]';
 layout.appendChild(controlPanel);
 layout.appendChild(mapPanel);
 
 const loading = document.createElement('div');
-loading.className = 'flex h-full items-center justify-center text-sm text-slate-400';
+loading.className = 'flex h-full items-center justify-center text-sm font-medium text-slate-400';
 loading.textContent = 'Loading datasets…';
 mapPanel.appendChild(loading);
+const overlay = document.createElement('div');
+overlay.className = 'map-panel-overlay';
+mapPanel.appendChild(overlay);
 
 const { weights: initialWeights, active: initialActive } = UIController.initialWeights();
 

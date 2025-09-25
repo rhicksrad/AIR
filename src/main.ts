@@ -63,7 +63,7 @@ mapColumn.appendChild(metricTabs);
 const metricButtons = new Map<MetricKey, HTMLButtonElement>();
 const metricDetails: Record<MetricKey, string> = {
   hbi: 'Blended health burden',
-  exposure: 'PM₂.₅ exposure',
+  exposure: 'Pollution',
   residual: 'Health minus pollution'
 };
 (

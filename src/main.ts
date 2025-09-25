@@ -117,18 +117,6 @@ mapColumn.appendChild(controlPanel);
 
 const detailsBody = detailsCard.querySelector('[data-role="county-details"]') as HTMLDivElement;
 
-const helperNote = document.createElement('div');
-helperNote.className = 'panel-surface text-sm leading-relaxed text-white/80';
-helperNote.innerHTML = `
-  <p class="text-sm font-semibold text-white">How to read this view</p>
-  <ul class="mt-2 list-disc space-y-1 pl-5">
-    <li>Tabs above the map switch between Health, air pollution, and the gap between them.</li>
-    <li>Click any county to update the table and keep the numbers visible while you explore.</li>
-    <li>Use the controls on the right to change the color groupings or tweak the blended index weights.</li>
-  </ul>
-`;
-mapColumn.appendChild(helperNote);
-
 const { weights: initialWeights, active: initialActive } = UIController.initialWeights();
 
 const state: AppState = {
@@ -169,6 +157,35 @@ const ui = new UIController(controlPanel, { ...initialWeights }, { ...initialAct
     renderCountyDetails(state.selectedCounty);
   }
 });
+
+const aboutPanel = document.createElement('section');
+aboutPanel.className = 'panel-surface flex flex-col gap-6 text-sm leading-relaxed text-white/80';
+aboutPanel.innerHTML = `
+  <div class="flex flex-col gap-2">
+    <span class="section-heading">About this explorer</span>
+    <h2 class="text-lg font-semibold text-white">How to read &amp; data notes</h2>
+  </div>
+  <div class="grid gap-6 md:grid-cols-2">
+    <div>
+      <p class="text-sm font-semibold text-white">How to read this view</p>
+      <ul class="mt-2 list-disc space-y-1 pl-5">
+        <li>Tabs above the map switch between Health, air pollution, and the gap between them.</li>
+        <li>Click any county to update the table and keep the numbers visible while you explore.</li>
+        <li>Use the controls on the right to change the color groupings or tweak the blended index weights.</li>
+      </ul>
+    </div>
+    <div>
+      <p class="text-sm font-semibold text-white">Data notes</p>
+      <ul class="mt-2 list-disc space-y-1 pl-5">
+        <li>CDC PLACES 2024 release (crude prevalence) for chronic conditions.</li>
+        <li>EPA Air Quality System PM₂.₅ monitor annual means averaged across available monitors.</li>
+        <li>Residuals derive from an ordinary least squares fit of HBI on pollution.</li>
+        <li>Methodology and limitations described in the README.</li>
+      </ul>
+    </div>
+  </div>
+`;
+layout.appendChild(aboutPanel);
 let derived: DerivedData | null = null;
 let baseCounties: CountyDatum[] = [];
 let mapInstance: CountyMap | null = null;

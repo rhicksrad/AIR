@@ -48,7 +48,8 @@ All required data live in the `data/` folder and are versioned in the repository
 
 1. **Data prep**
    - Coerce all FIPS to five-character strings and left-join CDC PLACES to pollution on FIPS.
-   - Drop counties missing PM2.5 or all selected PLACES measures. Counties with partial PLACES coverage are hatched on the map.
+   - Backfill missing PM2.5 monitor averages with a state-level mean so every county retains an exposure estimate (the national mean is used only when a state-level figure is unavailable).
+   - Drop counties missing all selected PLACES measures. Counties with partial PLACES coverage are hatched on the map.
 2. **Health Burden Index (HBI)**
    - User-selectable subset of PLACES variables.
    - Each active variable is min&ndash;max scaled to `[0, 1]` across counties, weighted (defaults are uniform), and averaged to produce HBI. Weights are clamped to `[0, 1]` and re-normalised to sum to one, with the configuration persisted in the URL hash.
@@ -68,7 +69,7 @@ All required data live in the `data/` folder and are versioned in the repository
 
 ## Limitations
 
-- The PM2.5 aggregation relies on the monitors available in the supplied AQS export and may not include every county. Coverage gaps are hatched on the choropleth.
+- The PM2.5 aggregation relies on the monitors available in the supplied AQS export; counties without monitors inherit their state's average, which smooths intra-state variation.
 - CDC PLACES indicators are crude prevalence estimates and do not capture sampling uncertainty or age adjustment.
 - Linear residuals assume a global relationship between exposure and burden; local factors (e.g., wildfire smoke, access to care) may lead to clusters of unexplained variation.
 - Normalisation rescales within the current dataset; comparisons across different years or datasets require recomputation.

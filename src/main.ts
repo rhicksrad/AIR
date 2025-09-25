@@ -25,7 +25,7 @@ if (!app) {
   throw new Error('App container not found');
 }
 
-app.className = 'relative mx-auto flex min-h-screen w-full max-w-[1600px] flex-col gap-10 px-5 py-10 text-slate-100';
+app.className = 'relative mx-auto flex min-h-screen w-full max-w-none flex-col gap-10 px-5 py-10 text-slate-100 xl:px-12';
 
 const glow = document.createElement('div');
 glow.className =
@@ -45,16 +45,12 @@ header.innerHTML = `
 app.appendChild(header);
 
 const layout = document.createElement('div');
-layout.className = 'relative grid flex-1 grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start';
+layout.className = 'relative flex flex-1 flex-col gap-8';
 app.appendChild(layout);
 
 const mapColumn = document.createElement('section');
-mapColumn.className = 'order-1 flex flex-col gap-6';
+mapColumn.className = 'relative flex flex-col gap-6';
 layout.appendChild(mapColumn);
-
-const controlPanel = document.createElement('aside');
-controlPanel.className = 'order-2 w-full xl:order-none xl:w-[360px]';
-layout.appendChild(controlPanel);
 
 const metricTabs = document.createElement('div');
 metricTabs.className = 'metric-tabs';
@@ -91,8 +87,13 @@ const metricDetails: Record<MetricKey, string> = {
 
 const mapPanel = document.createElement('div');
 mapPanel.className =
-  'relative flex min-h-[620px] flex-1 overflow-hidden rounded-[40px] border border-white/10 bg-slate-950/60 shadow-[0_50px_160px_-70px_rgba(15,23,42,1)] backdrop-blur-2xl';
+  'relative flex min-h-[640px] flex-1 overflow-hidden rounded-[48px] border border-white/10 bg-slate-950/60 shadow-[0_80px_200px_-80px_rgba(15,23,42,1)] backdrop-blur-2xl xl:min-h-[760px] xl:pr-[380px]';
 mapColumn.appendChild(mapPanel);
+
+const controlPanel = document.createElement('aside');
+controlPanel.className =
+  'relative z-10 w-full self-center -mt-6 xl:absolute xl:right-12 xl:top-12';
+mapColumn.appendChild(controlPanel);
 
 const loading = document.createElement('div');
 loading.className = 'flex h-full w-full items-center justify-center text-sm font-medium text-slate-300';

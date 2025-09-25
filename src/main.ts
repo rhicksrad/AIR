@@ -62,7 +62,8 @@ mapColumn.appendChild(metricTabs);
 
 const metricButtons = new Map<MetricKey, HTMLButtonElement>();
 const metricDetails: Record<MetricKey, string> = {
-  hbi: 'Blended health burden',
+
+  hbi: 'Health',
   exposure: 'Pollution',
   residual: 'Health minus pollution'
 };
@@ -120,7 +121,7 @@ helperNote.className = 'panel-surface text-sm leading-relaxed text-slate-600 dar
 helperNote.innerHTML = `
   <p class="text-sm font-semibold text-slate-900 dark:text-white">How to read this view</p>
   <ul class="mt-2 list-disc space-y-1 pl-5">
-    <li>Tabs above the map switch between the blended health burden, air pollution, and the gap between them.</li>
+    <li>Tabs above the map switch between Health, air pollution, and the gap between them.</li>
     <li>Click any county to update the table and keep the numbers visible while you explore.</li>
     <li>Use the controls on the right to change the color groupings, search for a place, or tweak the blended index weights.</li>
   </ul>

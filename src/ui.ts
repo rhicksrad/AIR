@@ -247,19 +247,6 @@ export class UIController {
     contentGrid.appendChild(this.outlierSection);
     this.setOutlierVisibility(false);
 
-    const notes = document.createElement('div');
-    notes.className =
-      'rounded-2xl border border-white/10 bg-white/5 p-4 text-xs leading-relaxed text-white/80 shadow-inner backdrop-blur xl:col-span-4';
-    notes.innerHTML = `
-      <p class="text-sm font-semibold text-white">Data notes</p>
-      <ul class="mt-2 list-disc space-y-1 pl-4">
-        <li>CDC PLACES 2024 release (crude prevalence) for chronic conditions.</li>
-        <li>EPA Air Quality System PM₂.₅ monitor annual means averaged across available monitors.</li>
-        <li>Residuals derive from an ordinary least squares fit of HBI on pollution.</li>
-        <li>Methodology and limitations described in the README.</li>
-      </ul>
-    `;
-    contentGrid.appendChild(notes);
     updateHash(this.weights, this.active);
   }
 

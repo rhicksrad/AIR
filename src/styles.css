@@ -1,0 +1,44 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+:root {
+  color-scheme: light dark;
+}
+
+a {
+  @apply text-primary underline;
+}
+
+body {
+  @apply bg-slate-100 text-slate-900 antialiased dark:bg-slate-950 dark:text-slate-100;
+}
+
+.card {
+  @apply rounded-xl bg-white/90 p-4 shadow-lg backdrop-blur dark:bg-slate-900/90;
+}
+
+button:focus-visible,
+input:focus-visible,
+select:focus-visible {
+  @apply outline-none ring-2 ring-primary/60 ring-offset-2 ring-offset-slate-100 dark:ring-offset-slate-900;
+}
+
+[data-hatched="true"] {
+  background-image: repeating-linear-gradient(
+    45deg,
+    rgba(15, 23, 42, 0.2) 0,
+    rgba(15, 23, 42, 0.2) 2px,
+    transparent 2px,
+    transparent 6px
+  );
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}

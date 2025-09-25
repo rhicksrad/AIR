@@ -73,6 +73,76 @@
   @apply border-primary/40 shadow-[0_18px_48px_-30px_rgba(30,64,175,0.6)];
 }
 
+.metric-tabs {
+  @apply grid gap-3 sm:grid-cols-3;
+}
+
+.metric-tab {
+  @apply flex flex-col gap-1 rounded-3xl border border-white/15 bg-white/70 p-4 text-left text-slate-600 shadow-[0_30px_90px_-60px_rgba(15,23,42,0.7)] transition hover:border-primary/40 hover:bg-primary/10 hover:text-primary dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-200;
+}
+
+.metric-tab-active {
+  @apply border-primary/60 bg-primary/15 text-primary dark:border-primary/60 dark:bg-primary/25 dark:text-primary/80;
+}
+
+.metric-tab-label {
+  @apply text-lg font-semibold text-slate-900 transition dark:text-white;
+}
+
+.metric-tab-active .metric-tab-label {
+  @apply text-primary dark:text-white;
+}
+
+.metric-tab-helper {
+  @apply text-xs text-slate-500 transition dark:text-slate-300;
+}
+
+.metric-tab-active .metric-tab-helper {
+  @apply text-primary/80 dark:text-primary/70;
+}
+
+.segmented {
+  @apply flex flex-wrap gap-2;
+}
+
+.segmented-button {
+  @apply rounded-full border border-white/20 bg-white/70 px-4 py-1.5 text-xs font-semibold text-slate-600 transition hover:border-primary/50 hover:bg-primary/10 hover:text-primary dark:border-white/10 dark:bg-slate-900/60 dark:text-slate-200;
+}
+
+.segmented-button-active {
+  @apply border-primary/60 bg-primary/20 text-primary dark:border-primary/60 dark:bg-primary/30 dark:text-primary/80;
+}
+
+.county-table {
+  @apply min-w-full divide-y divide-white/10 text-sm dark:divide-white/10;
+}
+
+.county-table thead {
+  @apply bg-white/70 text-left text-[11px] font-semibold uppercase tracking-[0.2em] text-slate-500 dark:bg-slate-900/50 dark:text-slate-300;
+}
+
+.county-table th,
+.county-table td {
+  @apply px-4 py-3 align-top;
+}
+
+.county-table tbody tr {
+  @apply border-t border-white/10 dark:border-white/10;
+}
+
+.metric-row-active {
+  @apply bg-primary/10 text-primary dark:bg-primary/25 dark:text-primary/80;
+}
+
+.metric-row-active th,
+.metric-row-active td {
+  @apply text-primary dark:text-primary/80;
+}
+
+.metric-row-helper {
+  @apply text-xs text-slate-500 dark:text-slate-300;
+}
+
 .btn-link {
   @apply text-xs font-semibold text-primary transition hover:text-primary/80;
 }
@@ -152,6 +222,11 @@ input[type='range']::-moz-range-thumb {
     transparent 2px,
     transparent 6px
   );
+}
+
+.county-selected {
+  stroke: #1d4ed8 !important;
+  stroke-width: 1.2 !important;
 }
 
 @media (prefers-reduced-motion: reduce) {

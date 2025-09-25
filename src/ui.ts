@@ -1,10 +1,9 @@
 import * as d3 from 'd3';
-import type { BreakMode, CountyDatum, MetricKey, Outlier, PlaceKey, WeightConfig } from './types';
+import type { BreakMode, CountyDatum, Outlier, PlaceKey, WeightConfig } from './types';
 import { PLACE_KEYS } from './types';
 import { formatNumber, normalizeWeights } from './stats';
 
 interface UIOptions {
-  onMetricChange: (metric: MetricKey) => void;
   onBreakModeChange: (mode: BreakMode) => void;
   onWeightsChange: (weights: WeightConfig, active: Record<PlaceKey, boolean>) => void;
   onSearch: (query: string) => void;
@@ -132,9 +131,7 @@ export class UIController {
 
   private options: UIOptions;
 
-  private metricSelect: HTMLSelectElement;
-
-  private breakSelect: HTMLSelectElement;
+  private breakButtons = new Map<BreakMode, HTMLButtonElement>();
 
   private weightPanel: HTMLElement;
 
@@ -158,6 +155,8 @@ export class UIController {
 
   private currentOutliers: Outlier[] = [];
 
+  private builderSection: HTMLElement;
+
   constructor(container: HTMLElement, weights: WeightConfig, active: Record<PlaceKey, boolean>, options: UIOptions) {
     this.container = container;
     this.weights = weights;
@@ -175,38 +174,32 @@ export class UIController {
     `;
     this.container.appendChild(title);
 
-    const metricGroup = document.createElement('div');
-    metricGroup.className = 'panel-surface flex flex-col gap-2';
-    metricGroup.innerHTML = `
-      <label class="control-label">Map metric</label>
-      <select class="form-control">
-        <option value="hbi">Health Burden Index</option>
-        <option value="exposure">Exposure Index</option>
-        <option value="residual">Residual (HBI - Expected)</option>
-      </select>
-    `;
-    this.metricSelect = metricGroup.querySelector('select') as HTMLSelectElement;
-    this.metricSelect.addEventListener('change', () => {
-      const metric = this.metricSelect.value as MetricKey;
-      this.options.onMetricChange(metric);
-      this.toggleOutliers(metric === 'residual');
-    });
-    this.container.appendChild(metricGroup);
-
     const breakGroup = document.createElement('div');
-    breakGroup.className = 'panel-surface flex flex-col gap-2';
+    breakGroup.className = 'panel-surface flex flex-col gap-3';
     breakGroup.innerHTML = `
-      <label class="control-label">Class breaks</label>
-      <select class="form-control">
-        <option value="quantile">Quantile (quintiles)</option>
-        <option value="equal">Equal interval</option>
-        <option value="jenks">Jenks (k-means)</option>
-      </select>
+      <label class="control-label">Color steps</label>
+      <div class="segmented" data-role="break-buttons"></div>
+      <p class="input-description">Choose how the colors are grouped. Quantile splits counties into even-sized groups.</p>
     `;
-    this.breakSelect = breakGroup.querySelector('select') as HTMLSelectElement;
-    this.breakSelect.addEventListener('change', () => {
-      this.options.onBreakModeChange(this.breakSelect.value as BreakMode);
+    const breakButtonRow = breakGroup.querySelector('[data-role="break-buttons"]') as HTMLElement;
+    const breakModes: { mode: BreakMode; label: string }[] = [
+      { mode: 'quantile', label: 'Even groups' },
+      { mode: 'equal', label: 'Equal ranges' },
+      { mode: 'jenks', label: 'Natural breaks' }
+    ];
+    breakModes.forEach(({ mode, label }) => {
+      const button = document.createElement('button');
+      button.type = 'button';
+      button.className = 'segmented-button';
+      button.textContent = label;
+      button.addEventListener('click', () => {
+        this.setBreakMode(mode);
+        this.options.onBreakModeChange(mode);
+      });
+      breakButtonRow.appendChild(button);
+      this.breakButtons.set(mode, button);
     });
+    this.setBreakMode('quantile');
     this.container.appendChild(breakGroup);
 
     const pmLabelGroup = document.createElement('div');
@@ -219,19 +212,19 @@ export class UIController {
     this.pmLabelInput.addEventListener('input', () => this.options.onPmLabelChange(this.pmLabelInput.value || '2016–2024'));
     this.container.appendChild(pmLabelGroup);
 
-    const builder = document.createElement('div');
-    builder.className = 'flex flex-col gap-4';
-    builder.innerHTML = `
+    this.builderSection = document.createElement('div');
+    this.builderSection.className = 'flex flex-col gap-4';
+    this.builderSection.innerHTML = `
       <div class="flex items-start justify-between gap-3">
         <div class="flex flex-col gap-1">
           <span class="section-heading">Custom index</span>
-          <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Health Burden Builder</h2>
+          <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Blend the health measures</h2>
         </div>
         <button type="button" class="btn-pill">Reset</button>
       </div>
-      <p class="input-description">Select CDC PLACES measures and adjust their influence on the index. Weights re-normalize automatically.</p>
+      <p class="input-description">Turn measures on or off and adjust their weights. The sliders always add up to 100%.</p>
     `;
-    const resetButton = builder.querySelector('button') as HTMLButtonElement;
+    const resetButton = this.builderSection.querySelector('button') as HTMLButtonElement;
     resetButton.addEventListener('click', () => {
       const uniform = 1 / PLACE_KEYS.length;
       PLACE_KEYS.forEach((key) => {
@@ -242,11 +235,10 @@ export class UIController {
       this.emitWeightChange();
       this.renderWeightPanel();
     });
-    this.container.appendChild(builder);
-
     this.weightPanel = document.createElement('div');
     this.weightPanel.className = 'flex flex-col gap-4';
-    this.container.appendChild(this.weightPanel);
+    this.builderSection.appendChild(this.weightPanel);
+    this.container.appendChild(this.builderSection);
     this.renderWeightPanel();
 
     const searchGroup = document.createElement('div');
@@ -298,7 +290,7 @@ export class UIController {
     this.outlierList = this.outlierSection.querySelector('[data-role="outlier-list"]') as HTMLElement;
     this.outlierButton.addEventListener('click', () => this.exportOutliers());
     this.container.appendChild(this.outlierSection);
-    this.toggleOutliers(false);
+    this.setOutlierVisibility(false);
 
     const notes = document.createElement('div');
     notes.className = 'rounded-2xl border border-white/10 bg-white/50 p-4 text-xs leading-relaxed text-slate-600 shadow-inner dark:border-white/10 dark:bg-slate-900/50 dark:text-slate-200';
@@ -341,13 +333,16 @@ export class UIController {
     this.renderWeightPanel();
   }
 
-  setMetric(metric: MetricKey) {
-    this.metricSelect.value = metric;
-    this.toggleOutliers(metric === 'residual');
+  setBreakMode(mode: BreakMode) {
+    this.breakButtons.forEach((button, key) => {
+      const isActive = key === mode;
+      button.classList.toggle('segmented-button-active', isActive);
+      button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+    });
   }
 
-  setBreakMode(mode: BreakMode) {
-    this.breakSelect.value = mode;
+  setBuilderVisibility(show: boolean) {
+    this.builderSection.style.display = show ? 'flex' : 'none';
   }
 
   updateOutliers(outliers: Outlier[]) {
@@ -380,7 +375,7 @@ export class UIController {
     });
   }
 
-  private toggleOutliers(show: boolean) {
+  setOutlierVisibility(show: boolean) {
     this.outlierSection.style.display = show ? 'flex' : 'none';
   }
 

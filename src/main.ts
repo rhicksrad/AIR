@@ -8,7 +8,6 @@ import {
   computeZScores,
   formatBreaks,
   formatNumber,
-  metricLabel,
   normalizeSeries,
   percentileRanks,
   symmetricBreaks
@@ -26,40 +25,121 @@ if (!app) {
   throw new Error('App container not found');
 }
 
-app.className = 'relative mx-auto flex min-h-screen w-full max-w-[1600px] flex-col gap-10 px-6 py-10 text-slate-100';
+app.className = 'relative mx-auto flex min-h-screen w-full max-w-[1600px] flex-col gap-10 px-5 py-10 text-slate-100';
 
 const glow = document.createElement('div');
 glow.className =
   'pointer-events-none absolute inset-0 -z-10 rounded-[48px] border border-white/10 bg-gradient-to-br from-white/5 via-transparent to-primary/10 shadow-[0_50px_140px_-60px_rgba(30,64,175,0.7)]';
 app.appendChild(glow);
 
+const header = document.createElement('header');
+header.className = 'flex flex-col gap-4 text-slate-200';
+header.innerHTML = `
+  <span class="section-heading">Air &amp; health</span>
+  <h1 class="text-4xl font-semibold leading-tight text-white">Where dirty air and chronic illness overlap</h1>
+  <p class="max-w-3xl text-base leading-relaxed text-slate-200">
+    Use this explorer to see how long-term fine particle pollution relates to chronic disease burdens. Pick a map view below,
+    then click a county to read its numbers in the table under the map.
+  </p>
+`;
+app.appendChild(header);
+
 const layout = document.createElement('div');
-layout.className = 'relative grid flex-1 grid-cols-1 gap-6 xl:grid-cols-[420px_1fr] xl:items-start';
+layout.className = 'relative grid flex-1 grid-cols-1 gap-8 xl:grid-cols-[minmax(0,1fr)_360px] xl:items-start';
 app.appendChild(layout);
 
+const mapColumn = document.createElement('section');
+mapColumn.className = 'order-1 flex flex-col gap-6';
+layout.appendChild(mapColumn);
+
 const controlPanel = document.createElement('aside');
-const mapPanel = document.createElement('section');
-mapPanel.className =
-  'relative flex min-h-[600px] flex-1 overflow-hidden rounded-3xl border border-white/10 bg-slate-900/50 shadow-[0_40px_120px_-60px_rgba(15,23,42,1)] backdrop-blur-2xl';
-controlPanel.className = 'w-full xl:w-[420px]';
+controlPanel.className = 'order-2 w-full xl:order-none xl:w-[360px]';
 layout.appendChild(controlPanel);
-layout.appendChild(mapPanel);
+
+const metricTabs = document.createElement('div');
+metricTabs.className = 'metric-tabs';
+mapColumn.appendChild(metricTabs);
+
+const metricButtons = new Map<MetricKey, HTMLButtonElement>();
+const metricDetails: Record<MetricKey, string> = {
+  hbi: 'Blended health burden',
+  exposure: 'PM₂.₅ exposure',
+  residual: 'Health minus pollution'
+};
+(
+  [
+    { key: 'hbi', helper: 'Weighted mix of chronic disease measures' },
+    { key: 'exposure', helper: 'Average fine particle levels' },
+    { key: 'residual', helper: 'Places where illness is higher than pollution alone predicts' }
+  ] as { key: MetricKey; helper: string }[]
+).forEach(({ key, helper }) => {
+  const button = document.createElement('button');
+  button.type = 'button';
+  button.className = 'metric-tab';
+  button.innerHTML = `
+    <span class="metric-tab-label">${metricDetails[key]}</span>
+    <span class="metric-tab-helper">${helper}</span>
+  `;
+  button.addEventListener('click', () => {
+    if (state.metric === key) return;
+    setMetric(key);
+  });
+  metricTabs.appendChild(button);
+  metricButtons.set(key, button);
+});
+
+const mapPanel = document.createElement('div');
+mapPanel.className =
+  'relative flex min-h-[620px] flex-1 overflow-hidden rounded-[40px] border border-white/10 bg-slate-950/60 shadow-[0_50px_160px_-70px_rgba(15,23,42,1)] backdrop-blur-2xl';
+mapColumn.appendChild(mapPanel);
 
 const loading = document.createElement('div');
-loading.className = 'flex h-full items-center justify-center text-sm font-medium text-slate-400';
-loading.textContent = 'Loading datasets…';
+loading.className = 'flex h-full w-full items-center justify-center text-sm font-medium text-slate-300';
+loading.textContent = 'Loading county and pollution data…';
 mapPanel.appendChild(loading);
+
 const overlay = document.createElement('div');
 overlay.className = 'map-panel-overlay';
 mapPanel.appendChild(overlay);
 
+const detailsCard = document.createElement('div');
+detailsCard.className = 'card flex flex-col gap-4';
+detailsCard.innerHTML = `
+  <div class="flex flex-col gap-1">
+    <span class="section-heading">County snapshot</span>
+    <h2 class="text-lg font-semibold text-slate-900 dark:text-white">Click a county to read the data</h2>
+  </div>
+  <div class="county-details" data-role="county-details"></div>
+`;
+mapColumn.appendChild(detailsCard);
+
+const detailsBody = detailsCard.querySelector('[data-role="county-details"]') as HTMLDivElement;
+
+const helperNote = document.createElement('div');
+helperNote.className = 'panel-surface text-sm leading-relaxed text-slate-600 dark:text-slate-200';
+helperNote.innerHTML = `
+  <p class="text-sm font-semibold text-slate-900 dark:text-white">How to read this view</p>
+  <ul class="mt-2 list-disc space-y-1 pl-5">
+    <li>Tabs above the map switch between the blended health burden, air pollution, and the gap between them.</li>
+    <li>Click any county to update the table and keep the numbers visible while you explore.</li>
+    <li>Use the controls on the right to change the color groupings, search for a place, or tweak the blended index weights.</li>
+  </ul>
+`;
+mapColumn.appendChild(helperNote);
+
 const { weights: initialWeights, active: initialActive } = UIController.initialWeights();
 
+const state: AppState = {
+  metric: 'hbi',
+  breakMode: 'quantile',
+  weights: initialWeights,
+  activeMeasures: initialActive,
+  legend: { bins: [], labels: [] },
+  pmYearLabel: '2016–2024',
+  selectedCounty: null
+};
+
 const ui = new UIController(controlPanel, { ...initialWeights }, { ...initialActive }, {
-  onMetricChange: (metric) => {
-    state.metric = metric;
-    updateVisualization();
-  },
   onBreakModeChange: (mode) => {
     state.breakMode = mode;
     updateVisualization();
@@ -73,26 +153,37 @@ const ui = new UIController(controlPanel, { ...initialWeights }, { ...initialAct
     if (!mapInstance) return;
     mapInstance.focusOnCounty(fips);
     mapInstance.flashCounty(fips);
+    if (derived) {
+      const target = derived.counties.find((county) => county.fips === fips);
+      if (target) {
+        state.selectedCounty = target;
+        renderCountyDetails(target);
+        mapInstance.setSelectedCounty(target.fips);
+      }
+    }
   },
   onOutlierSelect: (fips) => {
     if (!mapInstance) return;
     mapInstance.focusOnCounty(fips);
     mapInstance.flashCounty(fips);
+    if (derived) {
+      const target = derived.counties.find((county) => county.fips === fips);
+      if (target) {
+        state.selectedCounty = target;
+        renderCountyDetails(target);
+        mapInstance.setSelectedCounty(target.fips);
+      }
+    }
   },
   onPmLabelChange: (label) => {
     state.pmYearLabel = label || '2016–2024';
-    updateVisualization();
+    renderCountyDetails(state.selectedCounty);
   }
 });
-
-const state: AppState = {
-  metric: 'hbi',
-  breakMode: 'quantile',
-  weights: initialWeights,
-  activeMeasures: initialActive,
-  legend: { bins: [], labels: [] },
-  pmYearLabel: '2016–2024'
-};
+ui.setBreakMode(state.breakMode);
+ui.setBuilderVisibility(state.metric === 'hbi');
+ui.setOutlierVisibility(false);
+setMetric(state.metric);
 
 let derived: DerivedData | null = null;
 let baseCounties: CountyDatum[] = [];
@@ -104,40 +195,111 @@ function withPercent(value: number | null): string {
   return formatted === '—' ? formatted : `${formatted}%`;
 }
 
-function tooltipTemplate(datum: CountyDatum, metric: MetricKey): string {
-  const metricValue = metric === 'hbi' ? datum.hbi : metric === 'exposure' ? datum.exposure : datum.residual;
-  const metricPercentile = datum.percentile[metric] ?? null;
-  const base = `
-    <div class="flex flex-col gap-1">
-      <div class="flex items-center justify-between gap-4">
-        <h3 class="text-base font-semibold text-white">${datum.county}, ${datum.state}</h3>
-        <span class="text-xs font-mono text-slate-400">${datum.fips}</span>
+function renderCountyDetails(county: CountyDatum | null) {
+  if (!detailsBody) return;
+  if (!county) {
+    detailsBody.innerHTML = `
+      <p class="text-sm leading-relaxed text-slate-600 dark:text-slate-300">
+        Click any county on the map to see its chronic disease burdens, pollution levels, and percentile ranks.
+      </p>
+    `;
+    return;
+  }
+
+  const metricRows: { key: MetricKey; helper: string; value: number | null; percentile: number | null }[] = [
+    {
+      key: 'hbi',
+      helper: 'Weighted combination of the measures you turned on',
+      value: county.hbi,
+      percentile: county.percentile.hbi
+    },
+    {
+      key: 'exposure',
+      helper: `Average PM₂.₅ (µg/m³) across ${state.pmYearLabel}`,
+      value: county.exposure,
+      percentile: county.percentile.exposure
+    },
+    {
+      key: 'residual',
+      helper: `Positive values mean more illness than the pollution-only model predicted. Expected HBI: ${formatNumber(county.expectedHbi)}`,
+      value: county.residual,
+      percentile: county.percentile.residual
+    }
+  ];
+
+  const placeLabels: Record<PlaceKey, string> = {
+    asthma_pct: 'Adults with asthma',
+    copd_pct: 'Adults with COPD',
+    diabetes_pct: 'Adults with diabetes',
+    hypertension_pct: 'Adults with high blood pressure',
+    obesity_pct: 'Adults with obesity',
+    smoking_pct: 'Adults who smoke'
+  };
+
+  detailsBody.innerHTML = `
+    <div class="rounded-2xl border border-white/10 bg-white/60 p-4 text-slate-700 shadow-inner dark:border-white/10 dark:bg-slate-900/40 dark:text-slate-100">
+      <div class="flex flex-wrap items-baseline justify-between gap-2">
+        <h3 class="text-xl font-semibold text-slate-900 dark:text-white">${county.county}, ${county.state}</h3>
+        <span class="text-xs font-mono text-slate-500 dark:text-slate-300">${county.fips}</span>
       </div>
-      <div class="rounded bg-slate-900/60 px-3 py-2 text-xs text-slate-200">
-        <div class="font-semibold">${metricLabel(metric)}</div>
-        <div>Value: ${formatNumber(metricValue)}</div>
-        <div>Percentile: ${withPercent(metricPercentile)}</div>
-      </div>
-      <div class="grid grid-cols-2 gap-2 text-xs text-slate-200">
-        <div class="flex flex-col gap-0.5">
-          <span class="font-semibold">${metricLabel('hbi')}</span>
-          <span>Index: ${formatNumber(datum.hbi)}</span>
-          <span>Z: ${formatNumber(datum.hbiZ)}</span>
-          <span>Percentile: ${withPercent(datum.percentile.hbi)}</span>
-        </div>
-        <div class="flex flex-col gap-0.5">
-          <span class="font-semibold">${metricLabel('exposure')}</span>
-          <span>Index: ${formatNumber(datum.exposure)}</span>
-          <span>Z: ${formatNumber(datum.exposureZ)}</span>
-          <span>Percentile: ${withPercent(datum.percentile.exposure)}</span>
-        </div>
-      </div>
-      <div class="text-xs text-slate-300">PM₂.₅ window: ${state.pmYearLabel}</div>
-      ${datum.residual != null ? `<div class="text-xs text-orange-300">Residual: ${formatNumber(datum.residual)} (${withPercent(datum.percentile.residual)})</div>` : ''}
-      ${datum.hasDataGap ? '<div class="text-[11px] text-amber-300">One or more PLACES inputs missing.</div>' : ''}
+      <p class="text-xs text-slate-500 dark:text-slate-300">PM₂.₅ averaging window: ${state.pmYearLabel}</p>
+      ${county.hasDataGap ? '<p class="mt-1 text-xs text-amber-500">One or more health measures are missing for this county.</p>' : ''}
+    </div>
+    <div class="overflow-hidden rounded-2xl border border-white/10 bg-white/70 shadow-inner dark:border-white/10 dark:bg-slate-900/50">
+      <table class="county-table">
+        <thead>
+          <tr>
+            <th scope="col">Measure</th>
+            <th scope="col">Value</th>
+            <th scope="col">Percentile</th>
+          </tr>
+        </thead>
+        <tbody>
+          ${metricRows
+            .map((row) => {
+              const isActive = row.key === state.metric;
+              return `
+                <tr class="${isActive ? 'metric-row-active' : ''}">
+                  <th scope="row">
+                    <div class="flex flex-col gap-0.5">
+                      <span>${metricDetails[row.key]}</span>
+                      <span class="metric-row-helper">${row.helper}</span>
+                    </div>
+                  </th>
+                  <td>${formatNumber(row.value)}</td>
+                  <td>${withPercent(row.percentile)}</td>
+                </tr>
+              `;
+            })
+            .join('')}
+        </tbody>
+      </table>
+    </div>
+    <div class="panel-surface flex flex-col gap-2">
+      <p class="text-sm font-semibold text-slate-900 dark:text-white">Chronic disease inputs</p>
+      <ul class="grid grid-cols-1 gap-2 sm:grid-cols-2">
+        ${PLACE_KEYS.map((key) => `
+          <li class="flex flex-col gap-0.5 text-sm text-slate-600 dark:text-slate-200">
+            <span class="font-semibold text-slate-900 dark:text-white">${placeLabels[key]}</span>
+            <span>${withPercent((county[key] as number | null) ?? null)}</span>
+          </li>
+        `).join('')}
+      </ul>
     </div>
   `;
-  return base;
+}
+
+function setMetric(metric: MetricKey) {
+  state.metric = metric;
+  metricButtons.forEach((button, key) => {
+    const isActive = key === metric;
+    button.classList.toggle('metric-tab-active', isActive);
+    button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
+  });
+  ui.setBuilderVisibility(metric === 'hbi');
+  ui.setOutlierVisibility(metric === 'residual');
+  updateVisualization();
+  renderCountyDetails(state.selectedCounty);
 }
 
 function computeIndices(data: CountyDatum[], weights: WeightConfig, active: Record<PlaceKey, boolean>): DerivedData {
@@ -240,6 +402,7 @@ function updateVisualization() {
   const legend = computeLegend(state.metric, derived.counties, state.breakMode);
   state.legend = legend;
   mapInstance.update(derived.counties, state.metric, legend);
+  mapInstance.setSelectedCounty(state.selectedCounty ? state.selectedCounty.fips : null);
   if (state.metric === 'residual') {
     ui.updateOutliers(updateOutliers(derived.counties));
   } else {
@@ -248,11 +411,16 @@ function updateVisualization() {
   if (regressionBadge && derived) {
     regressionBadge.innerHTML = `<span class="font-semibold">OLS fit R²</span> <span class="font-mono">${formatNumber(derived.regressionR2)}</span>`;
   }
+  renderCountyDetails(state.selectedCounty);
 }
 
 function recalculate() {
   if (!baseCounties.length) return;
   derived = computeIndices(baseCounties, state.weights, state.activeMeasures);
+  if (state.selectedCounty) {
+    const updated = derived.counties.find((county) => county.fips === state.selectedCounty?.fips);
+    state.selectedCounty = updated ?? null;
+  }
   ui.updateData(derived.counties);
   updateVisualization();
 }
@@ -265,41 +433,21 @@ Promise.all([loadPlaces(), loadPm(), loadGeography()])
 
     mapPanel.removeChild(loading);
 
-    const mapDescription = document.createElement('div');
-    mapDescription.className =
-      'mb-3 flex flex-col gap-2 rounded-2xl bg-slate-950/70 p-5 text-sm leading-relaxed text-slate-100 shadow-xl backdrop-blur-lg';
-    mapDescription.innerHTML = `
-      <h2 class="text-base font-semibold text-white">How this map works</h2>
-      <p>
-        Each county's Health Burden Index blends CDC PLACES chronic disease measures with the weight sliders on the left.
-        Compare those burdens with long-term PM₂.₅ exposure, or switch to the residual view to see where health outcomes are
-        higher than the pollution-based expectation.
-      </p>
-      <ul class="list-disc space-y-1 pl-5 text-slate-200">
-        <li>Adjust the weights and metric selectors in the sidebar to change what is drawn on the map.</li>
-        <li>Hover over counties for detailed values, search for a place, or jump to outliers flagged by the model.</li>
-        <li>Use the PM₂.₅ window control to compare exposure averages across different time spans.</li>
-      </ul>
-    `;
-    mapPanel.appendChild(mapDescription);
-
     const mapContainer = document.createElement('div');
-    mapContainer.className = 'relative h-[600px] min-h-[420px] w-full';
+    mapContainer.className = 'relative h-[640px] min-h-[420px] w-full';
     mapPanel.appendChild(mapContainer);
 
     regressionBadge = document.createElement('div');
     regressionBadge.className = 'pointer-events-none absolute bottom-4 left-4 z-10 flex items-center gap-2 rounded-lg bg-slate-900/80 px-3 py-2 text-xs font-medium text-slate-100 shadow-lg';
     mapPanel.appendChild(regressionBadge);
 
-    mapInstance = new CountyMap(
-      mapContainer,
-      geography,
-      tooltipTemplate,
-      {
-        onHover: () => {},
-        onSelect: () => {}
+    mapInstance = new CountyMap(mapContainer, geography, undefined, {
+      onSelect: (datum) => {
+        state.selectedCounty = datum;
+        renderCountyDetails(datum);
+        mapInstance?.setSelectedCounty(datum.fips);
       }
-    );
+    });
 
     updateVisualization();
   })

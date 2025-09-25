@@ -78,6 +78,7 @@ export interface AppState {
   activeMeasures: Record<PlaceKey, boolean>;
   legend: LegendBreaks;
   pmYearLabel: string;
+  selectedCounty: CountyDatum | null;
 }
 
 export interface Outlier {

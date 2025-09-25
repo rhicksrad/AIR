@@ -52,7 +52,7 @@ export class CountyMap {
 
   private insetLayers: Map<string, d3.Selection<SVGGElement, unknown, null, undefined>> = new Map();
 
-  private tooltip: d3.Selection<HTMLDivElement, unknown, null, undefined>;
+  private tooltip: d3.Selection<HTMLDivElement, unknown, null, undefined> | null = null;
 
   private legend: d3.Selection<HTMLDivElement, unknown, null, undefined>;
 
@@ -64,7 +64,7 @@ export class CountyMap {
 
   private data = new Map<string, CountyDatum>();
 
-  private tooltipFormatter: TooltipFormatter;
+  private tooltipFormatter: TooltipFormatter | null;
 
   private callbacks: MapCallbacks;
 
@@ -80,9 +80,16 @@ export class CountyMap {
 
   private height = 640;
 
-  constructor(container: HTMLElement, geography: GeographyData, tooltipFormatter: TooltipFormatter, callbacks: MapCallbacks = {}) {
+  private selectedFips: string | null = null;
+
+  constructor(
+    container: HTMLElement,
+    geography: GeographyData,
+    tooltipFormatter?: TooltipFormatter,
+    callbacks: MapCallbacks = {}
+  ) {
     this.container = container;
-    this.tooltipFormatter = tooltipFormatter;
+    this.tooltipFormatter = tooltipFormatter ?? null;
     this.callbacks = callbacks;
     this.svg = d3
       .select(container)
@@ -112,10 +119,12 @@ export class CountyMap {
     this.mainLayer = this.svg.append('g').attr('class', 'counties');
     this.statesLayer = this.svg.append('g').attr('class', 'states');
 
-    this.tooltip = d3
-      .select(container)
-      .append('div')
-      .attr('class', 'map-tooltip');
+    if (this.tooltipFormatter) {
+      this.tooltip = d3
+        .select(container)
+        .append('div')
+        .attr('class', 'map-tooltip');
+    }
 
     this.legend = d3
       .select(container)
@@ -262,15 +271,19 @@ export class CountyMap {
     if (this.callbacks.onHover) {
       this.callbacks.onHover(datum);
     }
-    this.tooltip
-      .classed('hidden', false)
-      .html(this.tooltipFormatter(datum, this.currentMetric));
-    const [x, y] = d3.pointer(event, this.container);
-    this.tooltip.style('transform', `translate(${x + 16}px, ${y + 16}px)`);
+    if (this.tooltip && this.tooltipFormatter) {
+      this.tooltip
+        .classed('hidden', false)
+        .html(this.tooltipFormatter(datum, this.currentMetric));
+      const [x, y] = d3.pointer(event, this.container);
+      this.tooltip.style('transform', `translate(${x + 16}px, ${y + 16}px)`);
+    }
   }
 
   private hideTooltip() {
-    this.tooltip.classed('hidden', true);
+    if (this.tooltip) {
+      this.tooltip.classed('hidden', true);
+    }
     if (this.callbacks.onHover) {
       this.callbacks.onHover(null);
     }
@@ -320,6 +333,7 @@ export class CountyMap {
       updateFill(group.selectAll<SVGPathElement, GeoJSON.Feature>('path'));
     }
 
+    this.applySelection();
     this.renderLegend(scale);
   }
 
@@ -397,6 +411,23 @@ export class CountyMap {
     if (this.currentMetric === 'hbi') return datum.hbi;
     if (this.currentMetric === 'exposure') return datum.exposure;
     return datum.residual;
+  }
+
+  private applySelection() {
+    const apply = (selection: d3.Selection<SVGPathElement, GeoJSON.Feature, SVGGElement, unknown>) => {
+      selection.classed('county-selected', (feature) => ((feature.id as string) ?? '') === this.selectedFips);
+    };
+    if (this.countyPaths) apply(this.countyPaths);
+    for (const inset of INSETS) {
+      const group = this.insetLayers.get(inset.code);
+      if (!group) continue;
+      apply(group.selectAll<SVGPathElement, GeoJSON.Feature>('path'));
+    }
+  }
+
+  setSelectedCounty(fips: string | null) {
+    this.selectedFips = fips;
+    this.applySelection();
   }
 
   zoomReset() {

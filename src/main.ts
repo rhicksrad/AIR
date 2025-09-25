@@ -87,13 +87,11 @@ const metricDetails: Record<MetricKey, string> = {
 
 const mapPanel = document.createElement('div');
 mapPanel.className =
-  'relative flex min-h-[640px] flex-1 overflow-hidden rounded-[48px] border border-white/10 bg-slate-950/60 shadow-[0_80px_200px_-80px_rgba(15,23,42,1)] backdrop-blur-2xl xl:min-h-[760px] xl:pr-[380px]';
+  'relative flex min-h-[640px] flex-1 overflow-hidden rounded-[48px] border border-white/10 bg-slate-950/60 shadow-[0_80px_200px_-80px_rgba(15,23,42,1)] backdrop-blur-2xl xl:min-h-[760px]';
 mapColumn.appendChild(mapPanel);
 
 const controlPanel = document.createElement('aside');
-controlPanel.className =
-  'relative z-10 w-full self-center -mt-6 xl:absolute xl:right-12 xl:top-12';
-mapColumn.appendChild(controlPanel);
+controlPanel.className = 'relative z-10 w-full';
 
 const loading = document.createElement('div');
 loading.className = 'flex h-full w-full items-center justify-center text-sm font-medium text-slate-300';
@@ -114,6 +112,8 @@ detailsCard.innerHTML = `
   <div class="county-details" data-role="county-details"></div>
 `;
 mapColumn.appendChild(detailsCard);
+
+mapColumn.appendChild(controlPanel);
 
 const detailsBody = detailsCard.querySelector('[data-role="county-details"]') as HTMLDivElement;
 

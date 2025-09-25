@@ -162,7 +162,7 @@ export class UIController {
     this.weights = weights;
     this.active = active;
     this.options = options;
-    this.container.classList.add('card', 'flex', 'max-w-sm', 'flex-col', 'gap-7', 'text-slate-900', 'dark:text-slate-100');
+    this.container.classList.add('card', 'flex', 'w-full', 'flex-col', 'gap-8', 'text-slate-900', 'dark:text-slate-100');
     this.container.innerHTML = '';
 
     const title = document.createElement('div');
@@ -174,8 +174,12 @@ export class UIController {
     `;
     this.container.appendChild(title);
 
+    const contentGrid = document.createElement('div');
+    contentGrid.className = 'grid gap-6 xl:grid-cols-12';
+    this.container.appendChild(contentGrid);
+
     const breakGroup = document.createElement('div');
-    breakGroup.className = 'panel-surface flex flex-col gap-3';
+    breakGroup.className = 'panel-surface flex flex-col gap-3 xl:col-span-4';
     breakGroup.innerHTML = `
       <label class="control-label">Color steps</label>
       <div class="segmented" data-role="break-buttons"></div>
@@ -200,20 +204,20 @@ export class UIController {
       this.breakButtons.set(mode, button);
     });
     this.setBreakMode('quantile');
-    this.container.appendChild(breakGroup);
+    contentGrid.appendChild(breakGroup);
 
     const pmLabelGroup = document.createElement('div');
-    pmLabelGroup.className = 'panel-surface flex flex-col gap-2';
+    pmLabelGroup.className = 'panel-surface flex flex-col gap-2 xl:col-span-4';
     pmLabelGroup.innerHTML = `
       <label class="control-label">PM₂.₅ averaging window</label>
       <input type="text" class="form-control" placeholder="2016–2024" value="2016–2024" />
     `;
     this.pmLabelInput = pmLabelGroup.querySelector('input') as HTMLInputElement;
     this.pmLabelInput.addEventListener('input', () => this.options.onPmLabelChange(this.pmLabelInput.value || '2016–2024'));
-    this.container.appendChild(pmLabelGroup);
+    contentGrid.appendChild(pmLabelGroup);
 
     this.builderSection = document.createElement('div');
-    this.builderSection.className = 'flex flex-col gap-4';
+    this.builderSection.className = 'flex flex-col gap-4 xl:col-span-8';
     this.builderSection.innerHTML = `
       <div class="flex items-start justify-between gap-3">
         <div class="flex flex-col gap-1">
@@ -238,11 +242,11 @@ export class UIController {
     this.weightPanel = document.createElement('div');
     this.weightPanel.className = 'flex flex-col gap-4';
     this.builderSection.appendChild(this.weightPanel);
-    this.container.appendChild(this.builderSection);
+    contentGrid.appendChild(this.builderSection);
     this.renderWeightPanel();
 
     const searchGroup = document.createElement('div');
-    searchGroup.className = 'panel-surface flex flex-col gap-3';
+    searchGroup.className = 'panel-surface flex flex-col gap-3 xl:col-span-4';
     searchGroup.innerHTML = `
       <label class="control-label">Search counties</label>
       <input type="search" class="form-control" placeholder="Type a county or FIPS" />
@@ -271,10 +275,10 @@ export class UIController {
       this.options.onSearch(button.dataset.fips ?? '');
       this.searchResults.innerHTML = '';
     });
-    this.container.appendChild(searchGroup);
+    contentGrid.appendChild(searchGroup);
 
     this.outlierSection = document.createElement('div');
-    this.outlierSection.className = 'panel-surface flex flex-col gap-4';
+    this.outlierSection.className = 'panel-surface flex flex-col gap-4 xl:col-span-4';
     this.outlierSection.innerHTML = `
       <div class="flex items-start justify-between gap-3">
         <div class="flex flex-col gap-1">
@@ -289,11 +293,12 @@ export class UIController {
     this.outlierButton = this.outlierSection.querySelector('button') as HTMLButtonElement;
     this.outlierList = this.outlierSection.querySelector('[data-role="outlier-list"]') as HTMLElement;
     this.outlierButton.addEventListener('click', () => this.exportOutliers());
-    this.container.appendChild(this.outlierSection);
+    contentGrid.appendChild(this.outlierSection);
     this.setOutlierVisibility(false);
 
     const notes = document.createElement('div');
-    notes.className = 'rounded-2xl border border-white/10 bg-white/50 p-4 text-xs leading-relaxed text-slate-600 shadow-inner dark:border-white/10 dark:bg-slate-900/50 dark:text-slate-200';
+    notes.className =
+      'rounded-2xl border border-white/10 bg-white/50 p-4 text-xs leading-relaxed text-slate-600 shadow-inner dark:border-white/10 dark:bg-slate-900/50 dark:text-slate-200 xl:col-span-4';
     notes.innerHTML = `
       <p class="text-sm font-semibold text-slate-900 dark:text-white">Data notes</p>
       <ul class="mt-2 list-disc space-y-1 pl-4">
@@ -303,7 +308,7 @@ export class UIController {
         <li>Methodology and limitations described in the README.</li>
       </ul>
     `;
-    this.container.appendChild(notes);
+    contentGrid.appendChild(notes);
     updateHash(this.weights, this.active);
   }
 

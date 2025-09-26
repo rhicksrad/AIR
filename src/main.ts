@@ -1,6 +1,15 @@
 import './styles.css';
 import { combineData, loadGeography, loadPlaces, loadPm } from './data';
-import type { AppState, BreakMode, CountyDatum, MetricKey, Outlier, PlaceKey, WeightConfig } from './types';
+import type {
+  AppState,
+  BreakMode,
+  CountyDatum,
+  MetricKey,
+  Outlier,
+  OutlierMetric,
+  PlaceKey,
+  WeightConfig
+} from './types';
 import { PLACE_KEYS } from './types';
 import {
   computeBreaks,
@@ -310,7 +319,7 @@ function setMetric(metric: MetricKey) {
     button.setAttribute('aria-pressed', isActive ? 'true' : 'false');
   });
   ui.setBuilderVisibility(metric === 'hbi');
-  ui.setOutlierVisibility(metric === 'residual');
+  ui.setOutlierVisibility(metric === 'residual' || metric === 'pollutionMinusHealth');
   updateVisualization();
   renderCountyDetails(state.selectedCounty);
 }
@@ -410,16 +419,32 @@ function computeLegend(metric: MetricKey, data: CountyDatum[], mode: BreakMode) 
   return computeBreaks(values, mode);
 }
 
-function updateOutliers(data: CountyDatum[]): Outlier[] {
-  const residuals = data
-    .filter((d) => d.residual != null && d.residual > 0)
-    .sort((a, b) => (b.residual ?? 0) - (a.residual ?? 0))
+function buildOutliers(data: CountyDatum[], metric: OutlierMetric): Outlier[] {
+  if (metric === 'residual') {
+    const residuals = data
+      .filter((d) => d.residual != null && d.residual > 0)
+      .sort((a, b) => (b.residual ?? 0) - (a.residual ?? 0))
+      .slice(0, 25);
+    return residuals.map((d) => ({
+      fips: d.fips,
+      county: d.county,
+      state: d.state,
+      metric: 'residual',
+      value: d.residual ?? 0,
+      exposure: d.exposure,
+      hbi: d.hbi
+    }));
+  }
+  const lowBurden = data
+    .filter((d) => d.pollutionMinusHealth != null && d.pollutionMinusHealth > 0)
+    .sort((a, b) => (b.pollutionMinusHealth ?? 0) - (a.pollutionMinusHealth ?? 0))
     .slice(0, 25);
-  return residuals.map((d) => ({
+  return lowBurden.map((d) => ({
     fips: d.fips,
     county: d.county,
     state: d.state,
-    residual: d.residual ?? 0,
+    metric: 'pollutionMinusHealth',
+    value: d.pollutionMinusHealth ?? 0,
     exposure: d.exposure,
     hbi: d.hbi
   }));
@@ -431,10 +456,10 @@ function updateVisualization() {
   state.legend = legend;
   mapInstance.update(derived.counties, state.metric, legend);
   mapInstance.setSelectedCounty(state.selectedCounty ? state.selectedCounty.fips : null);
-  if (state.metric === 'residual') {
-    ui.updateOutliers(updateOutliers(derived.counties));
+  if (state.metric === 'residual' || state.metric === 'pollutionMinusHealth') {
+    ui.updateOutliers(buildOutliers(derived.counties, state.metric), state.metric);
   } else {
-    ui.updateOutliers([]);
+    ui.updateOutliers([], null);
   }
   if (regressionBadge && derived) {
     regressionBadge.innerHTML = `<span class="font-semibold">OLS fit R²</span> <span class="font-mono">${formatNumber(derived.regressionR2)}</span>`;

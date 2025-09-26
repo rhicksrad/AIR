@@ -1,5 +1,5 @@
 import * as d3 from 'd3';
-import type { BreakMode, CountyDatum, Outlier, PlaceKey, WeightConfig } from './types';
+import type { BreakMode, CountyDatum, Outlier, OutlierMetric, PlaceKey, WeightConfig } from './types';
 import { PLACE_KEYS } from './types';
 import { formatNumber, normalizeWeights } from './stats';
 
@@ -126,6 +126,10 @@ export class UIController {
 
   private outlierSection: HTMLElement;
 
+  private outlierTitle: HTMLElement;
+
+  private outlierDescription: HTMLElement;
+
   private outlierButton: HTMLButtonElement;
 
   private pmLabelInput: HTMLInputElement;
@@ -137,6 +141,8 @@ export class UIController {
   private data: CountyDatum[] = [];
 
   private currentOutliers: Outlier[] = [];
+
+  private currentOutlierMetric: OutlierMetric | null = null;
 
   private builderSection: HTMLElement;
 
@@ -234,15 +240,17 @@ export class UIController {
       <div class="flex items-start justify-between gap-3">
         <div class="flex flex-col gap-1">
           <span class="section-heading">Signal counties</span>
-          <h2 class="text-lg font-semibold text-white">High-burden outliers</h2>
+          <h2 class="text-lg font-semibold text-white" data-role="outlier-title">High-burden outliers</h2>
         </div>
         <button type="button" class="btn-primary">Export CSV</button>
       </div>
-      <p class="input-description">Counties whose observed burden exceeds the regression expectation given PM₂.₅.</p>
+      <p class="input-description" data-role="outlier-description">Counties whose observed burden exceeds the regression expectation given PM₂.₅.</p>
       <div class="flex max-h-64 flex-col gap-2 overflow-y-auto pr-1" data-role="outlier-list"></div>
     `;
     this.outlierButton = this.outlierSection.querySelector('button') as HTMLButtonElement;
     this.outlierList = this.outlierSection.querySelector('[data-role="outlier-list"]') as HTMLElement;
+    this.outlierTitle = this.outlierSection.querySelector('[data-role="outlier-title"]') as HTMLElement;
+    this.outlierDescription = this.outlierSection.querySelector('[data-role="outlier-description"]') as HTMLElement;
     this.outlierButton.addEventListener('click', () => this.exportOutliers());
     contentGrid.appendChild(this.outlierSection);
     this.setOutlierVisibility(false);
@@ -288,12 +296,34 @@ export class UIController {
     this.builderSection.style.display = show ? 'flex' : 'none';
   }
 
-  updateOutliers(outliers: Outlier[]) {
+  updateOutliers(outliers: Outlier[], metric: OutlierMetric | null) {
     this.currentOutliers = outliers;
-    if (!outliers.length) {
-      this.outlierList.innerHTML = '<p class="input-description">No counties exceed the expected burden for the selected configuration.</p>';
+    this.currentOutlierMetric = metric;
+
+    const title =
+      metric === 'pollutionMinusHealth' ? 'Low-burden outliers' : 'High-burden outliers';
+    const description =
+      metric === 'pollutionMinusHealth'
+        ? 'Counties whose observed burden falls below the regression expectation given PM₂.₅.'
+        : 'Counties whose observed burden exceeds the regression expectation given PM₂.₅.';
+    const emptyMessage =
+      metric === 'pollutionMinusHealth'
+        ? 'No counties fall below the expected burden for the selected configuration.'
+        : 'No counties exceed the expected burden for the selected configuration.';
+    const valueLabel = metric === 'pollutionMinusHealth' ? 'Pollution – health gap' : 'Residual';
+
+    if (this.outlierTitle) {
+      this.outlierTitle.textContent = title;
+    }
+    if (this.outlierDescription) {
+      this.outlierDescription.textContent = description;
+    }
+
+    if (!metric || !outliers.length) {
+      this.outlierList.innerHTML = `<p class="input-description">${emptyMessage}</p>`;
       return;
     }
+
     this.outlierList.innerHTML = outliers
       .map(
         (item) => `
@@ -303,7 +333,7 @@ export class UIController {
             <span class="font-mono text-[11px] text-white/50">${item.fips}</span>
           </div>
           <div class="flex flex-wrap gap-x-4 gap-y-1 text-[11px] text-white/60 transition group-hover:text-white">
-            <span>Residual: <strong class="text-white">${formatNumber(item.residual)}</strong></span>
+            <span>${valueLabel}: <strong class="text-white">${formatNumber(item.value)}</strong></span>
             <span>Exposure: ${formatNumber(item.exposure)}</span>
             <span>HBI: ${formatNumber(item.hbi)}</span>
           </div>
@@ -324,7 +354,8 @@ export class UIController {
 
   private exportOutliers() {
     if (!this.currentOutliers.length) return;
-    const header = ['fips', 'county', 'state', 'residual', 'exposure', 'hbi'];
+    const metricKey = this.currentOutlierMetric === 'pollutionMinusHealth' ? 'pollution_minus_health' : 'residual';
+    const header = ['fips', 'county', 'state', metricKey, 'exposure', 'hbi'];
     const formatCsv = (value: number | null | undefined) => {
       if (value == null || Number.isNaN(value)) return '';
       return value.toFixed(4);
@@ -333,7 +364,7 @@ export class UIController {
       row.fips,
       row.county,
       row.state,
-      formatCsv(row.residual),
+      formatCsv(row.value),
       formatCsv(row.exposure ?? null),
       formatCsv(row.hbi ?? null)
     ]);
@@ -342,7 +373,8 @@ export class UIController {
     const url = URL.createObjectURL(blob);
     const a = document.createElement('a');
     a.href = url;
-    a.download = 'residual_outliers.csv';
+    const filename = this.currentOutlierMetric === 'pollutionMinusHealth' ? 'pollution_minus_health_outliers.csv' : 'residual_outliers.csv';
+    a.download = filename;
     document.body.appendChild(a);
     a.click();
     document.body.removeChild(a);

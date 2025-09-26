@@ -82,11 +82,14 @@ export interface AppState {
   selectedCounty: CountyDatum | null;
 }
 
+export type OutlierMetric = 'residual' | 'pollutionMinusHealth';
+
 export interface Outlier {
   fips: string;
   county: string;
   state: string;
-  residual: number;
+  metric: OutlierMetric;
+  value: number;
   exposure: number | null;
   hbi: number | null;
 }
